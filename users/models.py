@@ -5,6 +5,7 @@ from PIL import Image
 
 # Extending User Model Using a One-To-One Link
 class Profile(models.Model):
+    # If an user is deleted, the correponding model will be deleted, too.
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     avatar = models.ImageField(default='default.jpg', upload_to='profile_images')
@@ -21,5 +22,7 @@ class Profile(models.Model):
 
         if img.height > 100 or img.width > 100:
             new_img = (100, 100)
-            img.thumbnail(new_img)
+            img.thumbnail(new_img) # image thumbnail rotate raw image horizontally?
             img.save(self.avatar.path)
+
+# class Prediction
