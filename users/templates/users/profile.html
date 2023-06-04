@@ -42,6 +42,7 @@
                         {{ profile_form.avatar }}
                     </div>
                     <label class="small mb-1">Bio:</label> {{ profile_form.bio }}
+                    <label class="small mb-1">Bio2:</label> {{ profile_form.bio2 }}
                 </div>
             </div>
             <br><br>
@@ -50,8 +51,8 @@
         </form>
     </div>
 
-    <hr>
-    <div> 
+    {% comment %} <hr> {% endcomment %}
+    {% comment %} <div> 
         <p> User's medical imaging data. </p>
         <!-- <img src="../../../../media/chest-xray.jpg" alt="medical image">  -->
 
@@ -77,5 +78,5 @@
             <li class="list-group-item">Vestibulum at eros</li>
           </ul> -->
         
-    </div>
+    </div> {% endcomment %}
 {% endblock content %}

@@ -97,7 +97,7 @@ DATABASES = {
         },
     'default': {
         'ENGINE': 'sql_server.pyodbc',
-        'NAME': 'bmev2',
+        'NAME': 'bmev2.1',
         'USER': 'root_user',
         'PASSWORD': 'Caiquanquegivay123@',
         'HOST': 'bmecore.database.windows.net',

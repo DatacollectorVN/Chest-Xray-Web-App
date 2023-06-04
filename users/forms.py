@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 
-from .models import Profile
+from .models import Profile, ConditionPrediction, DummyModel
 
 
 class RegisterForm(UserCreationForm):
@@ -82,7 +82,30 @@ class UpdateUserForm(forms.ModelForm):
 class UpdateProfileForm(forms.ModelForm):
     avatar = forms.ImageField(widget=forms.FileInput(attrs={'class': 'form-control-file'}))
     bio = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 5}))
+    bio2 = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 5}))
 
     class Meta:
         model = Profile
-        fields = ['avatar', 'bio']
+        fields = ['avatar', 'bio', 'bio2']
+
+MODALITY_CHOICES= [
+    ('xray', 'Xray'),
+    ('others', 'Others'),
+    ]
+
+class UpdateConditionPredictionForm(forms.ModelForm):
+    category = forms.CharField(required=True, label='Modality', widget=forms.Select(attrs={'class': 'form-control'}, choices=MODALITY_CHOICES))
+    input_image = forms.ImageField(required=True, widget=forms.FileInput(attrs={'class': 'form-control-file'}))
+    
+    class Meta:
+        model = ConditionPrediction
+        fields = ['category', 'input_image']
+        
+        
+class DummyForm(forms.ModelForm):
+    x = forms.IntegerField()
+    x_image = forms.ImageField(widget=forms.FileInput(attrs={'class': 'form-control-file'}))
+    
+    class Meta:
+        model = DummyModel
+        fields = ["x", "x_image"]

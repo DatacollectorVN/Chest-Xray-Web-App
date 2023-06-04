@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.contrib.auth.views import LoginView, PasswordResetView, PasswordChangeView
 from django.contrib import messages
@@ -6,8 +6,8 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.views import View
 from django.contrib.auth.decorators import login_required
 
-from .forms import RegisterForm, LoginForm, UpdateUserForm, UpdateProfileForm
-
+from .forms import RegisterForm, LoginForm, UpdateUserForm, UpdateProfileForm, UpdateConditionPredictionForm, DummyForm
+from .models import DummyModel, ConditionPrediction
 
 def home(request):
     return render(request, 'users/home.html')
@@ -98,3 +98,109 @@ def profile(request):
         profile_form = UpdateProfileForm(instance=request.user.profile)
 
     return render(request, 'users/profile.html', {'user_form': user_form, 'profile_form': profile_form})
+
+# @login_required
+# def prediction(request):   
+#     context = {"hello": "This is Tran"}
+#     # dummy_form = {"first_value": 10}
+    
+#     if request.method == 'POST':
+#         dummy_form = DummyForm(request.POST)
+        
+#         if dummy_form.is_valid():
+#             dummy_form.save()
+#             messages.success(request, "update dummy form successful")
+#             return redirect(to='users-condition-prediction')
+    
+#     else:
+#         context['dummy_form'] = DummyForm()
+#     return render(request, 'users/prediction.html', context=context)
+
+from django.contrib.auth.mixins import LoginRequiredMixin
+class ConditionPredictionView(LoginRequiredMixin, View):
+    def get(self, request):
+        dummy_list = DummyModel.objects.all();
+        # print(dummy_list)
+        # condition_prediction_list = ConditionPrediction.objects.count();
+        
+        # condition_prediction_list = {"hello"}
+        # print(condition_prediction_list)
+        
+        context = {'dummy_list': dummy_list} # 'condition_prediction_list' : condition_prediction_list
+        return render(request, 'users/prediction.html', context=context)
+    
+    
+# We use reverse_lazy() because we are in "constructor attribute" code
+# that is run before urls.py is completely loaded
+class ConditionPredictionCreate(LoginRequiredMixin, View):
+    template = 'users/prediction_form.html'
+    successful_url = reverse_lazy('condition_prediction_all')
+    
+    def get(self, request):
+        form = DummyForm()
+        ctx = {'form': form}
+        return render(request, self.template, ctx)
+    
+    def post(self, request):
+        form = DummyForm(request.POST)
+        if not form.is_valid():
+            ctx = {'form': form}
+            return render(request, self.template, ctx)
+        
+        dummy = form.save()
+        return redirect(self.successful_url)
+    
+    
+# the get/post/validate/store flow
+class ConditionPredictionUpdate(LoginRequiredMixin, View):
+    model = DummyModel
+    success_url = reverse_lazy('condition_prediction_all')
+    template = 'users/prediction_form.html'
+
+    def get(self, request, pk):
+        dummy_item = get_object_or_404(self.model, pk=pk)
+        form = DummyForm(instance=dummy_item)
+        
+        ctx = {'form': form, "dummy_item": dummy_item}
+        return render(request, self.template, ctx)
+
+    def post(self, request, pk):
+        dummy_item = get_object_or_404(self.model, pk=pk)
+        # print("dummy_item:", dummy_item.__dict__)
+        
+        # print("request.POST:", request.POST)
+        # print("request.FILES:", request.FILES)
+        
+        form = DummyForm(request.POST, request.FILES, instance=dummy_item)
+        
+        if not form.is_valid():
+            print("This form is not valid")
+            ctx = {'form': form}
+            return render(request, self.template, ctx)
+        
+        # print("form:", form)
+        # print("form['x_image']:", form["x_image"].__dict__)
+        # print("form:", form.__dict__)
+
+        form.save()
+        return redirect(self.success_url)
+
+
+class ConditionPredictionDelete(LoginRequiredMixin, View):
+    model = DummyModel
+    success_url = reverse_lazy('condition_prediction_all')
+    template = 'users/prediction_confirm_delete.html'
+    
+    def get(self, request, pk):
+        dummy_item = get_object_or_404(self.model, pk=pk)
+        form = DummyForm(instance=dummy_item)
+        ctx = {'dummy_item': dummy_item}
+        return render(request, self.template, ctx)
+    
+    def post(self, request, pk):
+        dummy_item = get_object_or_404(self.model, pk=pk)
+        dummy_item.delete()
+        return redirect(self.success_url)
+
+        
+
