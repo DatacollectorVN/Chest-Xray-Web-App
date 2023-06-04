@@ -1,0 +1,54 @@
+{% extends "users/base.html" %}
+
+{% block banner %}  
+    <div style="display: inline-flex" > 
+        <img src="../../../../media/iu_logo.png" alt="IU logo" width="20%" height="20%">
+        <img src="../../../../media/bme_logo.jpg" alt="BME logo" width="20%" height="20%">
+    </div>
+{% endblock banner %}
+
+{% block title %} Prediction Page {% endblock title%}
+
+{% block content %}
+    <div class="jumbotron">        
+        <h1 class="display-4">Welcome, {{user.first_name.title|default:'Guest'}}</h1>
+        <p class="lead">
+            This is Prediction site.
+        </p>
+    </div>
+
+    <hr>
+
+    <div> 
+        <p> Upload Image to Azure DataLake </p>
+        {% if condition_prediction_list %}
+           <p> This has condition prediction list </p>
+        {% endif %}
+
+    </div>
+
+    <hr>
+
+    <div> 
+        <p> Download Image from Azure DataLake </p>
+    </div>
+
+    <hr>
+
+
+    <h1> Prediction List</h1>
+    {% if dummy_list %}
+    <ul>
+        {% for dummy_item in dummy_list %}
+        <li>
+            {{ dummy_item.x }}
+        (<a href="{% url 'condition_prediction_update' dummy_item.id %}">Update</a>
+        | <a href="{% url 'condition_prediction_delete' dummy_item.id %}">Delete</a>)
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+        <p>There are no items in the library.</p>
+    {% endif %}
+    <p><a href="{% url 'condition_prediction_create' %}">Add a dummy item</a></p>
+{% endblock %}

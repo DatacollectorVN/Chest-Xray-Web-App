@@ -1,0 +1,21 @@
+{% extends "users/base.html" %}
+
+{% block banner %}  
+    <div style="display: inline-flex" > 
+        <img src="../../../../media/iu_logo.png" alt="IU logo" width="20%" height="20%">
+        <img src="../../../../media/bme_logo.jpg" alt="BME logo" width="20%" height="20%">
+    </div>
+{% endblock banner %}
+
+{% block title %} Prediction Page {% endblock title%}
+{% block content %}
+    <h1>Delete Prediction</h1>
+    <p>Are you sure you want to delete the condition prediction: {{ dummy_item }}?</p>
+
+    <form action="" method="POST">
+    {% csrf_token %}
+    <input type="submit" value="Yes, delete.">
+    <input type="submit" onclick="window.location='{% url 'condition_prediction_all' %}' ; return false;" value="Cancel">
+    </form>
+
+{% endblock %}

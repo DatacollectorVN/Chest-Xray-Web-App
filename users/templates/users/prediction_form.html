@@ -1,0 +1,42 @@
+{% extends "users/base.html" %}
+
+{% block banner %}  
+    <div style="display: inline-flex" > 
+        <img src="../../../../media/iu_logo.png" alt="IU logo" width="20%" height="20%">
+        <img src="../../../../media/bme_logo.jpg" alt="BME logo" width="20%" height="20%">
+    </div>
+{% endblock banner %}
+
+{% block title %} Prediction Page {% endblock title%}
+{% block content %}
+  <div>
+    <p> Input image: </p>
+    {% comment %} <br> {% endcomment %}
+    <img src="{{dummy_item.x_image.url}} />
+  </div>
+
+  <hr>
+
+  <form action="" method="post"  enctype="multipart/form-data">
+    {% csrf_token %}
+    <label class="small mb-1">Change X value:</label>
+    {{ form.x }}
+
+    <hr>
+    <label class="small mb-1">Change X Image:</label>
+    {{ form.x_image }}
+    <hr>
+    
+    <input type="submit" value="Submit">
+    <input type="submit" onclick="window.location='{% url 'condition_prediction_all' %}' ; return false;" value="Cancel">
+  </form>
+
+  {% comment %} <form action="" method="post">
+    {% csrf_token %}
+    <table>
+    {{ form.as_p }}
+    </table>
+    <input type="submit" value="Submit">
+    <input type="submit" onclick="window.location='{% url 'condition_prediction_all' %}' ; return false;" value="Cancel">
+  </form> {% endcomment %}
+{% endblock %}
