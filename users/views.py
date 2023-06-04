@@ -183,6 +183,29 @@ class ConditionPredictionUpdate(LoginRequiredMixin, View):
         # print("form:", form.__dict__)
 
         form.save()
+
+        # abc.jpg
+
+        # saved media/input_images/
+        # media/user_id_<id>/
+            # -- avatar
+            # -- prediction/
+                # -- input/
+                    # abc.jpg(before) --> input_image.jpg (after)
+                    # abc.png(before) --> input_image.png (after)
+
+        # get image_path = media/input_images/abc.jpg
+        
+        # change name media/input_images/abc.jpg --> media/input_images/input_image.jpg (replace) (local)
+        
+        # upload image to datalake
+            # prediction/user_id_<id>/input/input_image.jpg
+
+        # send post request to AI VM
+
+        # (in the future)
+            # change url_image in database
+            # input_images/abc.jpg --> prediction/user_id_<id>/input/input_image.jpg
         return redirect(self.success_url)
 
 
