@@ -10,12 +10,12 @@
 {% block title %} Prediction Page {% endblock title%}
 {% block content %}
     <h1>Delete Prediction</h1>
-    <p>Are you sure you want to delete the condition prediction: {{ dummy_item }}?</p>
+    <p>Are you sure you want to delete the image prediction: {{ image_prediction_item }}?</p>
 
     <form action="" method="POST">
     {% csrf_token %}
     <input type="submit" value="Yes, delete.">
-    <input type="submit" onclick="window.location='{% url 'condition_prediction_all' %}' ; return false;" value="Cancel">
+    <input type="submit" onclick="window.location='{% url 'image_prediction_all' %}' ; return false;" value="Cancel">
     </form>
 
 {% endblock %}

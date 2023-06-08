@@ -9,27 +9,58 @@
 
 {% block title %} Prediction Page {% endblock title%}
 {% block content %}
-  <div>
-    <p> Input image: </p>
-    {% comment %} <br> {% endcomment %}
-    <img src="{{dummy_item.x_image.url}} />
-  </div>
+    <div class="jumbotron">        
+      <h1 class="display-4">Welcome, {{user.first_name.title|default:'Guest'}}</h1>
+      <p> Your user.id is {{user.id|default:'None'}} </p>
+      <p class="lead">
+          This is Prediction site.
+      </p>
+    </div>
 
-  <hr>
+    <h1> Image Prediction Section </h1>
+    <div>
+      <p> Input image: </p>
+      {% comment %} <br> {% endcomment %}
+      <img src="{{image_prediction_item.input_image.url}}" />
+    </div>
 
-  <form action="" method="post"  enctype="multipart/form-data">
-    {% csrf_token %}
-    <label class="small mb-1">Change X value:</label>
-    {{ form.x }}
+    <form action="" method="post"  enctype="multipart/form-data">
+      {% csrf_token %}
+      <label class="small mb-1">Choose category:</label>
+      {{ image_prediction_form.category}}
 
-    <hr>
-    <label class="small mb-1">Change X Image:</label>
-    {{ form.x_image }}
+      <hr>
+      <label class="small mb-1">Choose input image:</label>
+      {{ image_prediction_form.input_image }}
+      <hr>
+      
+      <input type="submit" value="Submit">
+      <input type="submit" onclick="window.location='{% url 'image_prediction_all' %}' ; return false;" value="Cancel">
+    </form>
+
     <hr>
     
-    <input type="submit" value="Submit">
-    <input type="submit" onclick="window.location='{% url 'condition_prediction_all' %}' ; return false;" value="Cancel">
-  </form>
+    {% comment %} <h1> Dummy Section </h1>  
+    <div>
+      <p> Input image: </p>
+      <img src="{{dummy_item.x_image.url}}" />
+    </div>
+
+    <hr>
+
+    <form action="" method="post"  enctype="multipart/form-data">
+      {% csrf_token %}
+      <label class="small mb-1">Change X value:</label>
+      {{ form.x }}
+
+      <hr>
+      <label class="small mb-1">Change X Image:</label>
+      {{ form.x_image }}
+      <hr>
+      
+      <input type="submit" value="Submit">
+      <input type="submit" onclick="window.location='{% url 'image_prediction_all' %}' ; return false;" value="Cancel">
+    </form> {% endcomment %}
 
   {% comment %} <form action="" method="post">
     {% csrf_token %}
@@ -37,6 +68,6 @@
     {{ form.as_p }}
     </table>
     <input type="submit" value="Submit">
-    <input type="submit" onclick="window.location='{% url 'condition_prediction_all' %}' ; return false;" value="Cancel">
+    <input type="submit" onclick="window.location='{% url 'image_prediction_all' %}' ; return false;" value="Cancel">
   </form> {% endcomment %}
 {% endblock %}

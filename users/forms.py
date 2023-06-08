@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 
-from .models import Profile, ConditionPrediction, DummyModel
+from .models import Profile, ImagePrediction, DummyModel
 
 
 class RegisterForm(UserCreationForm):
@@ -93,13 +93,14 @@ MODALITY_CHOICES= [
     ('others', 'Others'),
     ]
 
-class UpdateConditionPredictionForm(forms.ModelForm):
+class ImagePredictionForm(forms.ModelForm):
     category = forms.CharField(required=True, label='Modality', widget=forms.Select(attrs={'class': 'form-control'}, choices=MODALITY_CHOICES))
     input_image = forms.ImageField(required=True, widget=forms.FileInput(attrs={'class': 'form-control-file'}))
     
     class Meta:
-        model = ConditionPrediction
+        model = ImagePrediction
         fields = ['category', 'input_image']
+        exclude = ['user']
         
         
 class DummyForm(forms.ModelForm):

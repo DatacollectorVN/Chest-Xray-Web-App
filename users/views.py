@@ -1,3 +1,5 @@
+import os
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.contrib.auth.views import LoginView, PasswordResetView, PasswordChangeView
@@ -5,9 +7,13 @@ from django.contrib import messages
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views import View
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
 
-from .forms import RegisterForm, LoginForm, UpdateUserForm, UpdateProfileForm, UpdateConditionPredictionForm, DummyForm
-from .models import DummyModel, ConditionPrediction
+from .forms import RegisterForm, LoginForm, UpdateUserForm, UpdateProfileForm, ImagePredictionForm
+from .models import ImagePrediction
+
+from .azure_dl.config.config_reader import ConfigReader
+from .azure_dl.connectors.azure_dl import initialize_storage_account
 
 def home(request):
     return render(request, 'users/home.html')
@@ -99,91 +105,150 @@ def profile(request):
 
     return render(request, 'users/profile.html', {'user_form': user_form, 'profile_form': profile_form})
 
-# @login_required
-# def prediction(request):   
-#     context = {"hello": "This is Tran"}
-#     # dummy_form = {"first_value": 10}
-    
-#     if request.method == 'POST':
-#         dummy_form = DummyForm(request.POST)
-        
-#         if dummy_form.is_valid():
-#             dummy_form.save()
-#             messages.success(request, "update dummy form successful")
-#             return redirect(to='users-condition-prediction')
-    
-#     else:
-#         context['dummy_form'] = DummyForm()
-#     return render(request, 'users/prediction.html', context=context)
-
 from django.contrib.auth.mixins import LoginRequiredMixin
-class ConditionPredictionView(LoginRequiredMixin, View):
+class ImagePredictionView(LoginRequiredMixin, View):
     def get(self, request):
-        dummy_list = DummyModel.objects.all();
-        # print(dummy_list)
-        # condition_prediction_list = ConditionPrediction.objects.count();
+        image_prediction_list = ImagePrediction.objects.filter(user_id=request.user.id)
         
-        # condition_prediction_list = {"hello"}
-        # print(condition_prediction_list)
-        
-        context = {'dummy_list': dummy_list} # 'condition_prediction_list' : condition_prediction_list
+        context = {'image_prediction_list': image_prediction_list} # 'condition_prediction_list' : condition_prediction_list
         return render(request, 'users/prediction.html', context=context)
     
     
 # We use reverse_lazy() because we are in "constructor attribute" code
 # that is run before urls.py is completely loaded
-class ConditionPredictionCreate(LoginRequiredMixin, View):
+class ImagePredictionCreate(LoginRequiredMixin, View):
     template = 'users/prediction_form.html'
-    successful_url = reverse_lazy('condition_prediction_all')
+    successful_url = reverse_lazy('image_prediction_all')
     
     def get(self, request):
-        form = DummyForm()
-        ctx = {'form': form}
+        image_prediction_form = ImagePredictionForm()
+        ctx = {'image_prediction_form': image_prediction_form}
         return render(request, self.template, ctx)
     
-    def post(self, request):
-        form = DummyForm(request.POST)
-        if not form.is_valid():
-            ctx = {'form': form}
+    def post(self, request): #Working on
+        image_prediction_form = ImagePredictionForm(request.POST, request.FILES)
+        
+        
+        if (not image_prediction_form.is_valid()): 
+            ctx = {'image_prediction_form': image_prediction_form}
             return render(request, self.template, ctx)
         
-        dummy = form.save()
+        # user_form.save()
+        image_prediction_object = image_prediction_form.save(commit=False) #form.save(commit=False) 
+        image_prediction_object.user = request.user
+        image_prediction_object.save()
+
+        # image_prediction_object = image_prediction_form.save()
+        
+        ############### Resave image files ###################################################
+        image_prediction_file_name = os.path.basename(image_prediction_object.input_image.url)
+        image_prediction_file_ext = os.path.splitext(image_prediction_file_name)[1]
+        
+        image_prediction_old_file_path = os.path.join(settings.MEDIA_ROOT, image_prediction_object.input_image.__str__())
+        image_prediction_new_file_path = os.path.join(settings.MEDIA_ROOT, "input_images", f"input_image_{image_prediction_object.id}_{image_prediction_object.user_id}" + image_prediction_file_ext)
+        image_prediction_new_internal_file_path = os.path.join("input_images", f"input_image_{image_prediction_object.id}_{image_prediction_object.user_id}" + image_prediction_file_ext)
+        # print("image_prediction_old_file_path:",image_prediction_old_file_path)
+        # print("image_prediction_new_file_path:", image_prediction_new_file_path)
+        os.replace(image_prediction_old_file_path, image_prediction_new_file_path)
+        
+        image_prediction_object.input_image = image_prediction_new_internal_file_path
+        image_prediction_object.save()
+        ############### Upload image to Azure Datalake ###################################################
+        config_reader = ConfigReader(file_name = '/mnt/d/Chest-Xray-Web-App/users/azure_dl/config/config.ini') # '/home/nathan/project/ChestXray-Model-API/app/config/config.ini'
+        service_client = initialize_storage_account(config_reader.azure_storage['azure_storage_account_name']
+            ,  config_reader.azure_storage['azure_storage_account_key']
+        )
+
+        file_system_client = service_client.get_file_system_client(file_system='prediction')   
+        directory_client = service_client.get_directory_client(file_system_client.file_system_name, 'input_images') # "chest_xray"
+        
+        image_path = os.path.join(settings.MEDIA_ROOT, image_prediction_object.input_image.__str__())
+        image_name = os.path.basename(image_path) 
+        with open(image_path, "rb") as file: #"/home/Chest-Xray-Web-App/test2.jpeg"
+            file_system_client = directory_client.create_file(image_name) #"test2.jpeg"
+            file_system_client.upload_data(file,  overwrite=True)
+            
+        ########################################### send post request to AI VM ###############################################
+            
         return redirect(self.successful_url)
+        
+        
     
     
 # the get/post/validate/store flow
-class ConditionPredictionUpdate(LoginRequiredMixin, View):
-    model = DummyModel
-    success_url = reverse_lazy('condition_prediction_all')
+class ImagePredictionUpdate(LoginRequiredMixin, View):
+    model = ImagePrediction
+    success_url = reverse_lazy('image_prediction_all')
     template = 'users/prediction_form.html'
 
     def get(self, request, pk):
-        dummy_item = get_object_or_404(self.model, pk=pk)
-        form = DummyForm(instance=dummy_item)
+        # image_prediction_form = ImagePredictionForm()
+        # # user_form = UpdateUserForm(instance=request.user)
+        # ctx = {'image_prediction_form': image_prediction_form} #, "user_form": user_form} #???
         
-        ctx = {'form': form, "dummy_item": dummy_item}
+        image_prediction_item = get_object_or_404(self.model, pk=pk)
+        image_prediction_form = ImagePredictionForm(instance=image_prediction_item)
+        
+        ctx = {'image_prediction_form': image_prediction_form, "image_prediction_item": image_prediction_item}
         return render(request, self.template, ctx)
 
     def post(self, request, pk):
-        dummy_item = get_object_or_404(self.model, pk=pk)
-        # print("dummy_item:", dummy_item.__dict__)
+        image_prediction_item = get_object_or_404(self.model, pk=pk)
+
+        image_prediction_form = ImagePredictionForm(request.POST, request.FILES, instance=image_prediction_item)
         
-        # print("request.POST:", request.POST)
-        # print("request.FILES:", request.FILES)
-        
-        form = DummyForm(request.POST, request.FILES, instance=dummy_item)
-        
-        if not form.is_valid():
+        if not image_prediction_form.is_valid():
             print("This form is not valid")
-            ctx = {'form': form}
+            ctx = {'image_prediction_form': image_prediction_form}
             return render(request, self.template, ctx)
         
-        # print("form:", form)
-        # print("form['x_image']:", form["x_image"].__dict__)
-        # print("form:", form.__dict__)
+        # image_prediction_form.save()
+        # Done form save
+        
+        image_prediction_object = image_prediction_form.save(commit=False) #form.save(commit=False) 
+        image_prediction_object.user = request.user
+        image_prediction_object.save()
+        
+        ############### Resave image files ###################################################
+        image_prediction_object = ImagePrediction.objects.filter(id=pk)[0]
+        # print(image_prediction_object.input_image)
+        # print("print(image_prediction_object.input_image.url):",image_prediction_object.input_image.url) # /media/input_images/live_voquangtran28101999_vg7EKfP.jpg
+        
+        # dir_name = os.path.dirname(image_prediction_object.input_image.url) #/media/input_images
+        image_prediction_file_name = os.path.basename(image_prediction_object.input_image.url) 
+        image_prediction_file_ext = os.path.splitext(image_prediction_file_name)[1]
 
-        form.save()
+        image_prediction_old_file_path = os.path.join(settings.MEDIA_ROOT, image_prediction_object.input_image.__str__()) #os.path.join(settings.MEDIA_ROOT, image_prediction_object.input_image.__str__())
+        # print("settings.MEDIA_ROOT:", settings.MEDIA_ROOT) # /mnt/d/Chest-Xray-Web-App/media
+        
+        image_prediction_new_file_path = os.path.join(settings.MEDIA_ROOT, "input_images", f"input_image_{image_prediction_object.id}_{image_prediction_object.user_id}" + image_prediction_file_ext)
+        image_prediction_new_internal_file_path = os.path.join("input_images", f"input_image_{image_prediction_object.id}_{image_prediction_object.user_id}" + image_prediction_file_ext)
+        os.replace(image_prediction_old_file_path, image_prediction_new_file_path)
 
+        image_prediction_object.input_image = image_prediction_new_internal_file_path
+        image_prediction_object.save()
+
+        ############### Upload image to Azure Datalake ###################################################
+        config_reader = ConfigReader(file_name = '/mnt/d/Chest-Xray-Web-App/users/azure_dl/config/config.ini') # '/home/nathan/project/ChestXray-Model-API/app/config/config.ini'
+        service_client = initialize_storage_account(config_reader.azure_storage['azure_storage_account_name']
+            ,  config_reader.azure_storage['azure_storage_account_key']
+        )
+
+        file_system_client = service_client.get_file_system_client(file_system='prediction')   
+        directory_client = service_client.get_directory_client(file_system_client.file_system_name, 'input_images') # "chest_xray"
+        
+        image_prediction_object = ImagePrediction.objects.filter(id=pk)[0]
+
+        image_path = os.path.join(settings.MEDIA_ROOT, image_prediction_object.input_image.__str__())
+        image_name = os.path.basename(image_path) 
+        with open(image_path, "rb") as file: #"/home/Chest-Xray-Web-App/test2.jpeg"
+            file_system_client = directory_client.create_file(image_name) #"test2.jpeg"
+            file_system_client.upload_data(file,  overwrite=True)
+            
+        ########################################### send post request to AI VM ###############################################
+        
+            
+        ########################################### Nhan's Guidance ##########################################################
         # abc.jpg
 
         # saved media/input_images/
@@ -194,9 +259,9 @@ class ConditionPredictionUpdate(LoginRequiredMixin, View):
                     # abc.jpg(before) --> input_image.jpg (after)
                     # abc.png(before) --> input_image.png (after)
 
-        # get image_path = media/input_images/abc.jpg
+        # get image_path = media/input_images/abc.jpg -> done
         
-        # change name media/input_images/abc.jpg --> media/input_images/input_image.jpg (replace) (local)
+        # change name media/input_images/abc.jpg --> media/input_images/input_image.jpg (replace) (local) -> done
         
         # upload image to datalake
             # prediction/user_id_<id>/input/input_image.jpg
@@ -209,20 +274,20 @@ class ConditionPredictionUpdate(LoginRequiredMixin, View):
         return redirect(self.success_url)
 
 
-class ConditionPredictionDelete(LoginRequiredMixin, View):
-    model = DummyModel
-    success_url = reverse_lazy('condition_prediction_all')
+class ImagePredictionDelete(LoginRequiredMixin, View):
+    model = ImagePrediction
+    success_url = reverse_lazy('image_prediction_all')
     template = 'users/prediction_confirm_delete.html'
     
     def get(self, request, pk):
-        dummy_item = get_object_or_404(self.model, pk=pk)
-        form = DummyForm(instance=dummy_item)
-        ctx = {'dummy_item': dummy_item}
+        image_prediction_item = get_object_or_404(self.model, pk=pk)
+        image_prediction_form = ImagePredictionForm(instance=image_prediction_item)
+        ctx = {'image_prediction_item': image_prediction_item}
         return render(request, self.template, ctx)
     
     def post(self, request, pk):
-        dummy_item = get_object_or_404(self.model, pk=pk)
-        dummy_item.delete()
+        image_prediction_item = get_object_or_404(self.model, pk=pk)
+        image_prediction_item.delete()
         return redirect(self.success_url)
 
         
