@@ -1,10 +1,18 @@
 {% extends "users/base.html" %}
+
+{% block banner %}  
+    <div style="display: inline-flex" > 
+        <img src="media/iu_logo.png" alt="IU logo" width="20%" height="20%">
+        <img src="media/bme_logo.jpg" alt="BME logo" width="20%" height="20%">
+    </div>
+{% endblock banner %}
+
 {% block title %} Home Page {% endblock title%}
 {% block content %}
-    <div class="jumbotron">
+    <div class="jumbotron">        
         <h1 class="display-4">Welcome, {{user.first_name.title|default:'Guest'}}</h1>
         <p class="lead">
-            This is an AI application in BME - VNIU
+            This is Chest X-ray Web Application version 2, from BME-IU.
         </p>
         <hr class="my-4">
         <p class="lead">

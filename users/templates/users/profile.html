@@ -1,4 +1,12 @@
 {% extends "users/base.html" %}
+
+{% block banner %}  
+    <div style="display: inline-flex" > 
+        <img src="../../../../media/iu_logo.png" alt="IU logo" width="20%" height="20%">
+        <img src="../../../../media/bme_logo.jpg" alt="BME logo" width="20%" height="20%">
+    </div>
+{% endblock banner %}
+
 {% block title %}Profile Page{% endblock title %}
 {% block content %}
     <div class="row my-3 p-3">
@@ -22,7 +30,7 @@
             <div class="form-row">
                 <div class="col-md-5">
                     <div class="form-group">
-                        <label class="small mb-1">Username:</label>
+                        <label class="small mb-1">User Name:</label>
                             {{ user_form.username }}
                         <label class="small mb-1">Email:</label>
                             {{ user_form.email }}
@@ -34,6 +42,7 @@
                         {{ profile_form.avatar }}
                     </div>
                     <label class="small mb-1">Bio:</label> {{ profile_form.bio }}
+                    <label class="small mb-1">Bio2:</label> {{ profile_form.bio2 }}
                 </div>
             </div>
             <br><br>
@@ -41,4 +50,33 @@
             <button type="reset" class="btn btn-dark btn-lg">Reset</button>
         </form>
     </div>
+
+    {% comment %} <hr> {% endcomment %}
+    {% comment %} <div> 
+        <p> User's medical imaging data. </p>
+        <!-- <img src="../../../../media/chest-xray.jpg" alt="medical image">  -->
+
+        <ul class="list-group">
+            <div style="overflow-y: auto; height:150px; ">
+                <li class="list-group-item"> <a href="https://www.w3schools.com"> Image 1 </a> </li> 
+                <li class="list-group-item"> <a href="https://www.w3schools.com"> Image 2 </a> </li> 
+                <li class="list-group-item"> <a href="https://www.w3schools.com"> Image 3 </a> </li> 
+                <li class="list-group-item"> <a href="https://www.w3schools.com"> Image 1 </a> </li> 
+                <li class="list-group-item"> <a href="https://www.w3schools.com"> Image 2 </a> </li> 
+                <li class="list-group-item"> <a href="https://www.w3schools.com"> Image 3 </a> </li> 
+                <li class="list-group-item"> <a href="https://www.w3schools.com"> Image 1 </a> </li> 
+                <li class="list-group-item"> <a href="https://www.w3schools.com"> Image 2 </a> </li> 
+                <li class="list-group-item"> <a href="https://www.w3schools.com"> Image 3 </a> </li> 
+            </div>
+        </ul>
+
+        <!-- <ul >
+            <li class="list-group-item active">Cras justo odio</li>
+            <li class="list-group-item">Dapibus ac facilisis in</li>
+            <li class="list-group-item">Morbi leo risus</li>
+            <li class="list-group-item">Porta ac consectetur ac</li>
+            <li class="list-group-item">Vestibulum at eros</li>
+          </ul> -->
+        
+    </div> {% endcomment %}
 {% endblock content %}

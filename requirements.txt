@@ -27,3 +27,6 @@ social-auth-core==4.3.0
 sqlparse==0.4.3
 toml==0.10.2
 urllib3==1.26.12
+azure-storage-file-datalake==12.11.0
+azure-storage-blob==12.16.0
+azure-core==1.26.4

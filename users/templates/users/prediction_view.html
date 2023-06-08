@@ -1,0 +1,35 @@
+{% extends "users/base.html" %}
+
+{% block banner %}  
+    <div style="display: inline-flex" > 
+        <img src="../../../../media/iu_logo.png" alt="IU logo" width="20%" height="20%">
+        <img src="../../../../media/bme_logo.jpg" alt="BME logo" width="20%" height="20%">
+    </div>
+{% endblock banner %}
+
+{% block title %} Prediction Page {% endblock title%}
+{% block content %}
+    <div class="jumbotron">        
+      <h1 class="display-4">Welcome, {{user.first_name.title|default:'Guest'}}</h1>
+      <p> Your user.id is {{user.id|default:'None'}} </p>
+      <p class="lead">
+          This is Prediction site.
+      </p>
+    </div>
+
+    <h1> Image Prediction Section </h1>
+    <div style="display: flex; flex-direction: row; margin: 10px"> 
+      <div>
+        <p> Input image: </p>
+        {% comment %} <br> {% endcomment %}
+        <img src="{{image_prediction_item.input_image.url}}" width="400" height="400" />
+      </div>
+      <hr>
+      <div>
+        <p> Output image: </p>
+        {% comment %} <br> {% endcomment %}
+        <img src="{{image_prediction_item.output_image.url}}" width="400" height="400" />
+      </div>
+    </div>
+    
+{% endblock %}
