@@ -160,6 +160,10 @@ class ImagePredictionCreate(LoginRequiredMixin, View):
         image_prediction_object.input_image = image_prediction_new_internal_file_path
         image_prediction_object.save()
         ############### Upload image to Azure Datalake ###################################################
+        import json
+        with open("/mnt/d/Chest-Xray-Web-App/users/config_ai_vm/config_ai_vm.json") as config_file:
+            config_data = json.load(config_file) #???
+        
         config_reader = ConfigReader(file_name = '/mnt/d/Chest-Xray-Web-App/users/azure_dl/config/config.ini') # '/home/nathan/project/ChestXray-Model-API/app/config/config.ini'
         service_client = initialize_storage_account(config_reader.azure_storage['azure_storage_account_name']
             ,  config_reader.azure_storage['azure_storage_account_key']
@@ -175,7 +179,14 @@ class ImagePredictionCreate(LoginRequiredMixin, View):
             file_system_client.upload_data(file,  overwrite=True)
             
         ########################################### send post request to AI VM ###############################################
+        import requests 
+
             
+        url = config_data["url"]
+        # url = 'https://prod-16.eastus.logic.azure.com:443/workflows/091f774adc5846ebb3f80234f8d84d7e/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=ggXbpwfMA2J5MgVkErXbbLz-ANVgEOJ2tgfC4wHk-Ns'         
+        r = requests.post(url, json={ "file_system_name": config_data["file_system_name"], "file_path": image_prediction_object.input_image.__str__(), "output_folder_path": config_data["output_folder_path"]}) 
+    
+        print(f"Status Code: {r.status_code}, Response: {r.json()}")            
         return redirect(self.successful_url)
     
 # the get/post/validate/store flow

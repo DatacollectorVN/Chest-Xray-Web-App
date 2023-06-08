@@ -1,0 +1,6 @@
+{
+    "file_system_name": "prediction", 
+    "file_path": null, 
+    "output_folder_path":"output_images",
+    "url": "https://prod-16.eastus.logic.azure.com:443/workflows/091f774adc5846ebb3f80234f8d84d7e/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=ggXbpwfMA2J5MgVkErXbbLz-ANVgEOJ2tgfC4wHk-Ns"
+}
