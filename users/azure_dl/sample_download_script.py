@@ -21,5 +21,4 @@ output_path = "/home/Chest-Xray-Web-App/test2.jpeg" # "/mnt/d/Chest-Xray-Web-App
 with open(output_path,'wb') as local_file:
     download= file_client.download_file()
     downloaded_bytes = download.readall()
-
     local_file.write(downloaded_bytes)

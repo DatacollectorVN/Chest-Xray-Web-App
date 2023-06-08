@@ -44,7 +44,7 @@ class ImagePrediction(models.Model):
     # input_url = models.URLField(default=None, blank=True, null=True) #image url
     # output_url = models.URLField(default=None, blank=True, null=True) 
     input_image = models.ImageField(default='default.jpg', upload_to="input_images") 
-    output_image = models.ImageField(default='default.jpg', upload_to="output_images") 
+    output_image = models.ImageField(default='output_image_default.jpg', upload_to="output_images") 
     
     timestamp = models.DateTimeField(editable=False)
     date_key = models.IntegerField(default=None, blank=True, null=True)

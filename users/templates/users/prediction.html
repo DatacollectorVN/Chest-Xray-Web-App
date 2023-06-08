@@ -28,27 +28,27 @@
                 {% comment %} style="display: flex; flex-direction: row; margin: 10px" {% endcomment %}
                 <div style="display: flex; flex-direction: row; margin: 10px"> 
                     <div style="padding: 10px"> 
-                        <img src="{{image_prediction_item.input_image.url}}" width="50" height="50" />
+                        <img src="{{image_prediction_item.input_image.url}}" width="100" height="100" />
                         {% comment %} {{ image_prediction_item.input_image }} {% endcomment %}
                     </div>
-                    <div>
-                        Image url:  {{ image_prediction_item.input_image.url }}
+                    <div  style="display: flex; align-items: center;">
+                        Image name:  {{ image_prediction_item.input_image }}
                         <br>
                         Current status: {{ image_prediction_item.status }}
                         <br>
-                        (
+                        {% comment %} (
                             {% if image_prediction_item.status == 'Complete' %}
                             <a href="{% url 'image_prediction_update' image_prediction_item.id %}">View</a>
                             |
                             {% endif %}
                             <a href="{% url 'image_prediction_delete' image_prediction_item.id %}">Delete</a>
-                        )
+                        ) {% endcomment %}
                     </div>
                     <div>
                         {% if image_prediction_item.status == 'Complete' %}
-                            <button type="button" class="btn btn-primary btn-sm" onclick="window.location='{% url 'image_prediction_update' image_prediction_item.id %}"> View </button>
+                            <button type="button" class="btn btn-primary btn-sm" onclick="window.location='{% url 'image_prediction_update' image_prediction_item.id %}'"> View </button>
                         {% endif %}
-                        <button type="button" class="btn btn-primary btn-sm" onclick="window.location='{% url 'image_prediction_delete' image_prediction_item.id %}"> Delete </button>
+                        <button type="button" class="btn btn-primary btn-sm" onclick="window.location='{% url 'image_prediction_delete' image_prediction_item.id %}'"> Delete </button>
                     </div>
                     {% comment %} <button onclick="window.location.href='http://google.com';">Go to Google</button> {% endcomment %}
                 </div>
@@ -59,6 +59,9 @@
     {% else %}
         <p>There are no image prediction items in the library.</p>
     {% endif %}
-    <p><a href="{% url 'image_prediction_create' %}"> Make a new image prediction</a></p>
+
+    {% comment %} <p><a href="{% url 'image_prediction_create' %}"> Make a new image prediction</a></p> {% endcomment %}
+    <button type="button" class="btn btn-primary btn-sm" onclick="window.location='{% url 'image_prediction_create' %}'"> Make a new image prediction </button>
+
 
 {% endblock %}
