@@ -18,6 +18,9 @@ from .azure_dl.connectors.azure_dl import initialize_storage_account
 def home(request):
     return render(request, 'users/home.html')
 
+def test(request):
+    return render(request, 'users/test.html')
+
 
 class RegisterView(View):
     form_class = RegisterForm
@@ -200,9 +203,44 @@ class ImagePredictionUpdate(LoginRequiredMixin, View):
         # print("image_prediction_item.output_image:", image_prediction_item.output_image) # output_images/output_image_10_1.jpg
         # print("image_prediction_item.output_image.url:", image_prediction_item.output_image.url) # /media/output_images/output_image_10_1.jpg
         # print("image_prediction_item.output_image.__str__():", image_prediction_item.output_image.__str__())
+        
+        input_image_file_path = os.path.join(settings.MEDIA_ROOT, image_prediction_item.input_image.__str__())
         output_image_file_path = os.path.join(settings.MEDIA_ROOT, image_prediction_item.output_image.__str__()) # /mnt/d/Chest-Xray-Web-App/media/output_images/output_image_10_1.jpg
         # print("output_image_path:", output_image_path) # True
         # print("os.path.exists(output_image_path):",os.path.exists(output_image_path))
+        
+        # If output_image is already in local storage.
+        if os.path.exists(input_image_file_path):
+            # Yes: Upload to view -> html
+            print("Input image exists locally, not download from datalake.")
+            pass
+        else: # If output_image not in local storage:
+            print("Input image not exists locally, download from datalake.")
+            
+            import json
+            with open("/mnt/d/Chest-Xray-Web-App/users/config_dl_vm/config_dl_vm.json") as config_file:
+                config_data = json.load(config_file)
+            
+            # Download from cloud AI model API to local storage.
+            config_reader = ConfigReader(file_name = config_data["config_dl_file_name"]) # '/home/nathan/project/ChestXray-Model-API/app/config/config.ini'
+            service_client = initialize_storage_account(config_reader.azure_storage['azure_storage_account_name']
+                ,  config_reader.azure_storage['azure_storage_account_key']
+            )
+            
+            file_system_client = service_client.get_file_system_client(file_system= config_data["file_system_name"])
+            # datalake file path
+            datalake_input_image_file_path =  image_prediction_item.input_image.__str__()
+            input_image_file_client = file_system_client.get_file_client(file_path = datalake_input_image_file_path)
+            
+            # output_path = os.path.join("/home/nathan/project/ChestXray-Model-API/app/", "images_1.jpeg")
+            input_path = input_image_file_path #"/home/Chest-Xray-Web-App/test2.jpeg" # "/mnt/d/Chest-Xray-Web-App/users/azure_dl/test2.jpeg" #/home/Chest-Xray-Web-App
+            with open(input_path,'wb') as local_file:
+                download= input_image_file_client.download_file()
+                downloaded_bytes = download.readall()
+                local_file.write(downloaded_bytes)
+            
+            # Upload to view -> html
+            pass
            
         # If output_image is already in local storage.
         if os.path.exists(output_image_file_path):
@@ -224,13 +262,13 @@ class ImagePredictionUpdate(LoginRequiredMixin, View):
             
             file_system_client = service_client.get_file_system_client(file_system= config_data["file_system_name"])
             # datalake file path
-            datalake_file_path =  image_prediction_item.output_image.__str__()
-            file_client = file_system_client.get_file_client(file_path = datalake_file_path)
+            datalake_output_image_file_path =  image_prediction_item.output_image.__str__()
+            output_image_file_client = file_system_client.get_file_client(file_path = datalake_output_image_file_path)
             
             # output_path = os.path.join("/home/nathan/project/ChestXray-Model-API/app/", "images_1.jpeg")
             output_path = output_image_file_path #"/home/Chest-Xray-Web-App/test2.jpeg" # "/mnt/d/Chest-Xray-Web-App/users/azure_dl/test2.jpeg" #/home/Chest-Xray-Web-App
             with open(output_path,'wb') as local_file:
-                download= file_client.download_file()
+                download= output_image_file_client.download_file()
                 downloaded_bytes = download.readall()
                 local_file.write(downloaded_bytes)
             

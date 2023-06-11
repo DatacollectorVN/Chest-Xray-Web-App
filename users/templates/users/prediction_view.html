@@ -9,13 +9,12 @@
 
 {% block title %} Prediction Page {% endblock title%}
 {% block content %}
-    <div class="jumbotron">        
+    {% comment %} <div class="jumbotron">        
       <h1 class="display-4">Welcome, {{user.first_name.title|default:'Guest'}}</h1>
-      <p> Your user.id is {{user.id|default:'None'}} </p>
       <p class="lead">
           This is Prediction site.
       </p>
-    </div>
+    </div> {% endcomment %}
 
     <h1> Image Prediction Section </h1>
     <div style="display: flex; flex-direction: row; margin: 10px"> 

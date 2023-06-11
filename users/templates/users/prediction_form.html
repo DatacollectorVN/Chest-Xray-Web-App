@@ -9,60 +9,34 @@
 
 {% block title %} Prediction Page {% endblock title%}
 {% block content %}
-    <div class="jumbotron">        
+    {% comment %} <div class="jumbotron">        
       <h1 class="display-4">Welcome, {{user.first_name.title|default:'Guest'}}</h1>
-      <p> Your user.id is {{user.id|default:'None'}} </p>
       <p class="lead">
           This is Prediction site.
       </p>
-    </div>
+    </div> {% endcomment %}
 
-    <h1> Image Prediction Section </h1>
+    <div class="container"> 
+      <div class="row">
+        <h1> Image Prediction Section </h1>
+      </div>
 
-    <form action="" method="post"  enctype="multipart/form-data">
-      {% csrf_token %}
-      <label class="small mb-1">Choose category:</label>
-      {{ image_prediction_form.category}}
-
-      <hr>
-      <label class="small mb-1">Choose input image:</label>
-      {{ image_prediction_form.input_image }}
-      <hr>
+      <div class="row">
+        <div class="col-6">
+          <form action="" method="post"  enctype="multipart/form-data">
+            {% csrf_token %}
+            <label class="small mb-1">Choose category:</label>
+            {{ image_prediction_form.category}}
       
-      <input type="submit" value="Submit">
-      <input type="submit" onclick="window.location='{% url 'image_prediction_all' %}' ; return false;" value="Cancel">
-    </form>
-
-    <hr>
-    
-    {% comment %} <h1> Dummy Section </h1>  
-    <div>
-      <p> Input image: </p>
-      <img src="{{dummy_item.x_image.url}}" />
+            <hr>
+            <label class="small mb-1">Choose input image:</label>
+            {{ image_prediction_form.input_image }}
+            <hr>
+            
+            <input type="submit" value="Submit">
+            <input type="submit" onclick="window.location='{% url 'image_prediction_all' %}' ; return false;" value="Cancel">
+          </form>
+        </div>
+      </div>
     </div>
-
-    <hr>
-
-    <form action="" method="post"  enctype="multipart/form-data">
-      {% csrf_token %}
-      <label class="small mb-1">Change X value:</label>
-      {{ form.x }}
-
-      <hr>
-      <label class="small mb-1">Change X Image:</label>
-      {{ form.x_image }}
-      <hr>
-      
-      <input type="submit" value="Submit">
-      <input type="submit" onclick="window.location='{% url 'image_prediction_all' %}' ; return false;" value="Cancel">
-    </form> {% endcomment %}
-
-  {% comment %} <form action="" method="post">
-    {% csrf_token %}
-    <table>
-    {{ form.as_p }}
-    </table>
-    <input type="submit" value="Submit">
-    <input type="submit" onclick="window.location='{% url 'image_prediction_all' %}' ; return false;" value="Cancel">
-  </form> {% endcomment %}
 {% endblock %}

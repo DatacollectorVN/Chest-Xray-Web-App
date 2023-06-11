@@ -10,58 +10,49 @@
 {% block title %} Prediction Page {% endblock title%}
 
 {% block content %}
-    <div class="jumbotron">        
-        <h1 class="display-4">Welcome, {{user.first_name.title|default:'Guest'}}</h1>
-        <p class="lead">
-            This is Prediction History Site.
-        </p>
-    </div>
-
-    <hr>
-
+    
     <h1> Image Prediction List</h1>
     {% if image_prediction_list %}
-    <ul class="list-group"> 
-        {% for image_prediction_item in image_prediction_list %}
-        <div>
-            <li class="list-group-item">
-                {% comment %} style="display: flex; flex-direction: row; margin: 10px" {% endcomment %}
-                <div style="display: flex; flex-direction: row; margin: 10px"> 
-                    <div style="padding: 10px"> 
-                        <img src="{{image_prediction_item.input_image.url}}" width="100" height="100" />
-                        {% comment %} {{ image_prediction_item.input_image }} {% endcomment %}
-                    </div>
-                    <div  style="display: flex; align-items: center;">
-                        Image name:  {{ image_prediction_item.input_image }}
-                        <br>
-                        Current status: {{ image_prediction_item.status }}
-                        <br>
-                        {% comment %} (
-                            {% if image_prediction_item.status == 'Complete' %}
-                            <a href="{% url 'image_prediction_update' image_prediction_item.id %}">View</a>
-                            |
-                            {% endif %}
-                            <a href="{% url 'image_prediction_delete' image_prediction_item.id %}">Delete</a>
-                        ) {% endcomment %}
-                    </div>
-                    <div>
-                        {% if image_prediction_item.status == 'Complete' %}
-                            <button type="button" class="btn btn-primary btn-sm" onclick="window.location='{% url 'image_prediction_update' image_prediction_item.id %}'"> View </button>
-                        {% endif %}
-                        <button type="button" class="btn btn-primary btn-sm" onclick="window.location='{% url 'image_prediction_delete' image_prediction_item.id %}'"> Delete </button>
-                    </div>
-                    {% comment %} <button onclick="window.location.href='http://google.com';">Go to Google</button> {% endcomment %}
-                </div>
-            </li>
-        </div>
-        {% endfor %}
-    </ul>
-    {% else %}
-        <p>There are no image prediction items in the library.</p>
-    {% endif %}
+    {% comment %} <div class="overflow-auto">  {% endcomment %}
+        <ul class="list-group"> 
+            {% for image_prediction_item in image_prediction_list %}
+            <div>
+                <li class="list-group-item">
+                    {% comment %} <div style="display: flex; flex-direction: row; margin: 10px">  {% endcomment %}
+                    <div class="container"> 
+                        <div class ="row align-items-center">
+                            {% comment %} <div style="padding: 10px">  {% endcomment %}
+                            <div class="col-2">
+                                <img src="{{image_prediction_item.input_image.url}}" class="img-thumbnail" width="150" height="150" />
+                                {% comment %} {{ image_prediction_item.input_image }} {% endcomment %}
+                            </div>
 
-    {% comment %} <p><a href="{% url 'image_prediction_create' %}"> Make a new image prediction</a></p> {% endcomment %}
-    <button type="button" class="btn btn-primary btn-sm" onclick="window.location='{% url 'image_prediction_create' %}'"> Make a new image prediction </button>
+                            {% comment %} <div  style="display: flex; align-items: center;"> {% endcomment %}
+                            <div class="col-8">
+                                Image name:  {{ image_prediction_item.input_image }}
+                                <br>
+                                Current status: {{ image_prediction_item.status }}
+                                <br>
+                            </div>
 
+                            <div class="col-2 d-flex flex-row justify-content-evenly">
+                                {% if image_prediction_item.status == 'Complete' %}
+                                    <button type="button" class="btn btn-success btn-sm p-2 m-1" onclick="window.location='{% url 'image_prediction_update' image_prediction_item.id %}'"> View </button>
+                                {% endif %}
+                                <button type="button" class="btn btn-danger btn-sm p-2 m-1" onclick="window.location='{% url 'image_prediction_delete' image_prediction_item.id %}'"> Delete </button>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </div>
+            {% endfor %}
+        </ul>
+        {% else %}
+            <p>There are no image prediction items in the library.</p>
+        {% endif %}
+    {% comment %} </div> {% endcomment %}
 
+        <button type="button" class="btn btn-primary btn-lg" onclick="window.location='{% url 'image_prediction_create' %}'"> Make a new image prediction </button>
+
+    
 {% endblock %}
