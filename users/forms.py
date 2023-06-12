@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 
-from .models import Profile, ImagePrediction, DummyModel
+from .models import Profile, ImagePrediction, DummyModel, DiseasePrediction
 
 
 class RegisterForm(UserCreationForm):
@@ -102,6 +102,11 @@ class ImagePredictionForm(forms.ModelForm):
         fields = ['category', 'input_image']
         exclude = ['user']
         
+# class DiseasePredictionForm(forms.ModelForm):
+#     ???
+    
+#     class Meta:
+#         model = DiseasePrediction
         
 class DummyForm(forms.ModelForm):
     x = forms.IntegerField()

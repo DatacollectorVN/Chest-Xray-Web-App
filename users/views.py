@@ -19,6 +19,8 @@ def home(request):
     return render(request, 'users/home.html')
 
 def test(request):
+    print("Hello World")
+    
     return render(request, 'users/test.html')
 
 
