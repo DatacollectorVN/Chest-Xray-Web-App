@@ -31,7 +31,13 @@
                             <div class="col-8">
                                 Image name:  {{ image_prediction_item.input_image }}
                                 <br>
-                                Current status: {{ image_prediction_item.status }}
+                                {% comment %} {{ image_prediction_item.status }} {% endcomment %}
+                                
+                                {% if image_prediction_item.status == 'Complete' %}
+                                   <p> <b> Current status: </b> <font color="green"> <b> Complete </b> </font> </p>
+                                {% else %}
+                                   <p> <b> Current status: </b> <font color="orange"> <b> In Progress </b> </font> </p>
+                                {% endif %}
                                 <br>
                             </div>
 

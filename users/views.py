@@ -1,4 +1,6 @@
 import os
+import json
+import requests 
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
@@ -10,7 +12,7 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 
 from .forms import RegisterForm, LoginForm, UpdateUserForm, UpdateProfileForm, ImagePredictionForm
-from .models import ImagePrediction
+from .models import ImagePrediction, DiseasePrediction
 
 from .azure_dl.config.config_reader import ConfigReader
 from .azure_dl.connectors.azure_dl import initialize_storage_account
@@ -131,7 +133,7 @@ class ImagePredictionCreate(LoginRequiredMixin, View):
     template = 'users/prediction_form.html'
     successful_url = reverse_lazy('image_prediction_submit_success') #'image_prediction_all')
     
-    def get(self, request):
+    def get(self, request):       
         image_prediction_form = ImagePredictionForm()
         ctx = {'image_prediction_form': image_prediction_form}
         return render(request, self.template, ctx)
@@ -165,9 +167,10 @@ class ImagePredictionCreate(LoginRequiredMixin, View):
         image_prediction_object.input_image = image_prediction_new_internal_file_path
         image_prediction_object.save()
         ############### Upload image to Azure Datalake ###################################################
-        import json
-        with open("/mnt/d/Chest-Xray-Web-App/users/config_dl_vm/config_dl_vm.json") as config_file:
-            config_data = json.load(config_file) #???
+        
+        config_path = os.path.join(settings.BASE_DIR, "users", "config_dl_vm", "config_dl_vm.json")
+        with open(config_path) as config_file:
+            config_data = json.load(config_file) 
         
         config_reader = ConfigReader(file_name = config_data["config_dl_file_name"]) # '/home/nathan/project/ChestXray-Model-API/app/config/config.ini'
         service_client = initialize_storage_account(config_reader.azure_storage['azure_storage_account_name']
@@ -184,8 +187,6 @@ class ImagePredictionCreate(LoginRequiredMixin, View):
             file_system_client.upload_data(file,  overwrite=True)
             
         ########################################### send post request to AI VM ###############################################
-        import requests 
-
         url = config_data["url"]
         # url = 'https://prod-16.eastus.logic.azure.com:443/workflows/091f774adc5846ebb3f80234f8d84d7e/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=ggXbpwfMA2J5MgVkErXbbLz-ANVgEOJ2tgfC4wHk-Ns'         
         r = requests.post(url, json={ "file_system_name": config_data["file_system_name"], "file_path": image_prediction_object.input_image.__str__(), "output_folder_path": config_data["output_folder_path"]}) 
@@ -195,12 +196,22 @@ class ImagePredictionCreate(LoginRequiredMixin, View):
     
 # the get/post/validate/store flow
 class ImagePredictionUpdate(LoginRequiredMixin, View):
-    model = ImagePrediction
+    image_prediction_model = ImagePrediction
+    disease_prediction_model = DiseasePrediction
     # success_url = reverse_lazy('image_prediction_all')
     template = 'users/prediction_view.html'
 
     def get(self, request, pk):
-        image_prediction_item = get_object_or_404(self.model, pk=pk)
+        image_prediction_item = get_object_or_404(self.image_prediction_model, pk=pk)
+        
+        lastest_timestamp = DiseasePrediction.objects.filter(image_prediction_id=image_prediction_item.id).order_by('-timestamp')[0].timestamp
+        # print("lastest_timestamp:",lastest_timestamp)
+        
+        disease_prediction_list = DiseasePrediction.objects.filter(image_prediction_id=image_prediction_item.id, timestamp = lastest_timestamp) #.values()
+        
+        # print(disease_prediction_list)
+        
+        
         # print("image_prediction_item.input_image:", image_prediction_item.input_image) # input_images/input_image_10_1.jpg
         # print("image_prediction_item.output_image:", image_prediction_item.output_image) # output_images/output_image_10_1.jpg
         # print("image_prediction_item.output_image.url:", image_prediction_item.output_image.url) # /media/output_images/output_image_10_1.jpg
@@ -219,8 +230,8 @@ class ImagePredictionUpdate(LoginRequiredMixin, View):
         else: # If output_image not in local storage:
             print("Input image not exists locally, download from datalake.")
             
-            import json
-            with open("/mnt/d/Chest-Xray-Web-App/users/config_dl_vm/config_dl_vm.json") as config_file:
+            config_path = os.path.join(settings.BASE_DIR, "users", "config_dl_vm", "config_dl_vm.json")
+            with open(config_path) as config_file:
                 config_data = json.load(config_file)
             
             # Download from cloud AI model API to local storage.
@@ -252,8 +263,8 @@ class ImagePredictionUpdate(LoginRequiredMixin, View):
         else: # If output_image not in local storage:
             print("Output image not exists locally, download from datalake.")
             
-            import json
-            with open("/mnt/d/Chest-Xray-Web-App/users/config_dl_vm/config_dl_vm.json") as config_file:
+            config_path = os.path.join(settings.BASE_DIR, "users", "config_dl_vm", "config_dl_vm.json")
+            with open(config_path) as config_file:
                 config_data = json.load(config_file)
             
             # Download from cloud AI model API to local storage.
@@ -280,7 +291,7 @@ class ImagePredictionUpdate(LoginRequiredMixin, View):
         # print(image_prediction_item.output_image)
         # print(image_prediction_item.output_image.url)
         
-        ctx = {"image_prediction_item": image_prediction_item}
+        ctx = {"image_prediction_item": image_prediction_item, "disease_prediction_list": disease_prediction_list}
         return render(request, self.template, ctx)
 
 

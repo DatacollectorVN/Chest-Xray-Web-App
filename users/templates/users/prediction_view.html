@@ -25,10 +25,47 @@
       </div>
       <hr>
       <div>
+        {% comment %} <br> {% endcomment %}
+        {% comment %} center this arrow vertically {% endcomment %}
+        <img src="../../../../media/arrow.png" width="200" height="200" />
+      </div>
+      <hr>
+      <div>
         <p> Output image: </p>
         {% comment %} <br> {% endcomment %}
         <img src="{{image_prediction_item.output_image.url}}" width="400" height="400" />
       </div>
     </div>
+
+
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-8">
+        </div>
+
+        <div class="col-4">
+          {% if disease_prediction_list %}
+          <ul class="list-group"> 
+            {% for disease_prediction_item in disease_prediction_list %}
+            <div> 
+            {% comment %} <div class="container"> {% endcomment %}
+              <li class="list-group-item">
+              {% if disease_prediction_item.disease and disease_prediction_item.location_xyxy and disease_prediction_item.score %}       
+                <p> {{disease_prediction_item.disease}} ({{disease_prediction_item.score}}) </p>
+              {% else %}
+                <p> Disease not found. </p>
+              {% endif %}
+
+              {% comment %} <button type="button" class="btn btn-success btn-sm p-2 m-1" onclick="window.location='{% url 'image_prediction_update' image_prediction_item.id %}'"> View </button> {% endcomment %}
+              </li>
+            </div>
+            {% endfor %}
+          </ul> 
+          {% else %}
+            <p> No disease detected. </p>
+          {% endif %}
+        </div>
+      <div>
+    <div>
     
 {% endblock %}

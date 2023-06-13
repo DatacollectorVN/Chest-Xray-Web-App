@@ -88,7 +88,7 @@ class DiseasePrediction(models.Model):
         super(DiseasePrediction, self).save(*args, **kwargs) # Call the "real" save() method.
         
     def __str__(self):
-        return self.user + " " + self.image_prediction.output_image.url + " " + self.disease 
+        return str(self.user.id) + " " + self.image_prediction.output_image.url + " " + self.disease 
     
     class Meta:
         db_table = "users_disease_prediction"
