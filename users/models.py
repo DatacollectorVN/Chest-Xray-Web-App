@@ -71,6 +71,27 @@ class ImagePrediction(models.Model):
     class Meta:
         db_table = "users_image_prediction"
     
+class DiseasePrediction(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(editable=False)
+    date_key = models.IntegerField(default=None, blank=True, null=True)
+    image_prediction = models.ForeignKey(ImagePrediction, on_delete=models.CASCADE)
+    disease = models.CharField(max_length=100, null=True, blank=True)
+    location_xyxy = models.CharField(max_length=100, null=True, blank=True)
+    score = models.DecimalField(max_digits=3, decimal_places=2, null=True, blank=True) #null=True, blank=True, default = 0
+    # https://groups.google.com/g/django-users/c/YggIgNhde1g/m/bXPixH6eeJEJ
+    
+    def save(self, *args, **kwargs):
+        self.timestamp = timezone.now()        
+        self.date_key = int(self.timestamp.strftime("%Y%m%d"))
+        
+        super(DiseasePrediction, self).save(*args, **kwargs) # Call the "real" save() method.
+        
+    def __str__(self):
+        return str(self.user.id) + " " + self.image_prediction.output_image.url + " " + self.disease 
+    
+    class Meta:
+        db_table = "users_disease_prediction"
     
 class DummyModel(models.Model):
     x = models.IntegerField(default=0)

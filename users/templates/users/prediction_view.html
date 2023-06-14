@@ -9,27 +9,69 @@
 
 {% block title %} Prediction Page {% endblock title%}
 {% block content %}
-    <div class="jumbotron">        
+    {% comment %} <div class="jumbotron">        
       <h1 class="display-4">Welcome, {{user.first_name.title|default:'Guest'}}</h1>
-      <p> Your user.id is {{user.id|default:'None'}} </p>
       <p class="lead">
           This is Prediction site.
       </p>
+    </div> {% endcomment %}
+    <div class="container"> 
+
+      <div class="row"> 
+        <h1> Image Prediction Section </h1>
+      </div>
+
+      <div class="row" style="display: flex; flex-direction: row; margin: 10px"> 
+        <div class="col-4 p-0 m-0">
+          <p> Input image: </p>
+          {% comment %} <br> {% endcomment %}
+          <img class="img-thumbnail" src="{{image_prediction_item.input_image.url}}" width="350" height="350" />
+        </div>
+        {% comment %} <hr> {% endcomment %}
+        <div class="col-4 d-flex align-items-center justify-content-center p-0 m-0">
+          <p> </p>
+          {% comment %} <br> {% endcomment %}
+          {% comment %} center this arrow vertically {% endcomment %}
+          <img src="../../../../media/arrow.png" width="200" height="200" />
+        </div>
+        {% comment %} <hr> {% endcomment %}
+        <div class="col-4 p-0 m-0">
+          <p> Output image: </p>
+          {% comment %} <br> {% endcomment %}
+          <img class="img-thumbnail" src="{{image_prediction_item.output_image.url}}" width="350" height="350" />
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-8">
+        </div>
+
+        <div class="col-4">
+          {% if disease_prediction_list %}
+
+            {% for disease_prediction_item in disease_prediction_list %}
+            <div> 
+            {% comment %} <div class="container"> {% endcomment %}
+              {% if disease_prediction_item.disease and disease_prediction_item.location_xyxy and disease_prediction_item.score %}       
+                <p> {{disease_prediction_item.disease}} ({{disease_prediction_item.score}}) </p>
+              {% else %}
+                <p> Disease not found. </p>
+              {% endif %}
+
+              {% comment %} <button type="button" class="btn btn-success btn-sm p-2 m-1" onclick="window.location='{% url 'image_prediction_update' image_prediction_item.id %}'"> View </button> {% endcomment %}
+
+            </div>
+            {% endfor %}
+          {% else %}
+            <p> No disease detected. </p>
+          {% endif %}
+        </div>
+      <div>
     </div>
 
-    <h1> Image Prediction Section </h1>
-    <div style="display: flex; flex-direction: row; margin: 10px"> 
-      <div>
-        <p> Input image: </p>
-        {% comment %} <br> {% endcomment %}
-        <img src="{{image_prediction_item.input_image.url}}" width="400" height="400" />
-      </div>
-      <hr>
-      <div>
-        <p> Output image: </p>
-        {% comment %} <br> {% endcomment %}
-        <img src="{{image_prediction_item.output_image.url}}" width="400" height="400" />
-      </div>
-    </div>
+
+
+
+
     
 {% endblock %}
