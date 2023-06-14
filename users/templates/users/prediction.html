@@ -29,7 +29,8 @@
 
                             {% comment %} <div  style="display: flex; align-items: center;"> {% endcomment %}
                             <div class="col-8">
-                                Image name:  {{ image_prediction_item.input_image }}
+                                <b> Updated at: </b>  {{ image_prediction_item.timestamp|date:"d/m/Y" }} {{ image_prediction_item.timestamp|time:"H:i" }}
+                                {% comment %} {{ value|date:"D d M Y" }} {{ value|time:"H:i" }} {% endcomment %}
                                 <br>
                                 {% comment %} {{ image_prediction_item.status }} {% endcomment %}
                                 

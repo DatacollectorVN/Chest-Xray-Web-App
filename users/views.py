@@ -119,6 +119,8 @@ class ImagePredictionView(LoginRequiredMixin, View):
         
         # print("image_prediction_list[0]:", image_prediction_list[0])
         # print("image_prediction_list[0].__dict__:", image_prediction_list[0].__dict__)
+        for image_prediction_item in image_prediction_list:
+            print(image_prediction_item.timestamp)
         
         context = {'image_prediction_list': image_prediction_list} # 'condition_prediction_list' : condition_prediction_list
         return render(request, 'users/prediction.html', context=context)
