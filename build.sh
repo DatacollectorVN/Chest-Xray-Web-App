@@ -1,0 +1,1 @@
+docker build -t webapp . --platform linux/x86_64
