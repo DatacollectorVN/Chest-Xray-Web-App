@@ -47,24 +47,42 @@
         </div>
 
         <div class="col-4">
-          {% if disease_prediction_list %}
+          {% if num_disease_found > 0%}
+            <p class='my-0'> <b> Found {{num_disease_found}} abnormal cases: </b> </p>
+            <p class='my-0'>
+              {% for disease_name, confidence_score_list in disease_dict.items%}
+                {{disease_name}}                
+                ({% for confidence_score_item in confidence_score_list %}
+                    {{confidence_score_item}}%
+                    {% if not forloop.last%}
+                    ,
+                    {% endif %}
+                  {% endfor%})
+                <br>
+              {% endfor%}
+            </p>
+            
+          {% else %}
+            <p> No disease found. <p>
+          {% endif %}
+
+
+          {% comment %} {% if disease_prediction_list %}
 
             {% for disease_prediction_item in disease_prediction_list %}
             <div> 
-            {% comment %} <div class="container"> {% endcomment %}
+
               {% if disease_prediction_item.disease and disease_prediction_item.location_xyxy and disease_prediction_item.score %}       
                 <p> {{disease_prediction_item.disease}} ({{disease_prediction_item.score}}) </p>
               {% else %}
                 <p> Disease not found. </p>
               {% endif %}
 
-              {% comment %} <button type="button" class="btn btn-success btn-sm p-2 m-1" onclick="window.location='{% url 'image_prediction_update' image_prediction_item.id %}'"> View </button> {% endcomment %}
-
             </div>
             {% endfor %}
           {% else %}
             <p> No disease detected. </p>
-          {% endif %}
+          {% endif %} {% endcomment %}
         </div>
       <div>
     </div>

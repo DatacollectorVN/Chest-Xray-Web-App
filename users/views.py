@@ -21,9 +21,16 @@ def home(request):
     return render(request, 'users/home.html')
 
 def test(request):
-    print("Hello World")
-    
     return render(request, 'users/test.html')
+
+def news_1(request):    
+    return render(request, 'users/news_1.html')
+
+def news_2(request):    
+    return render(request, 'users/news_2.html')
+
+def news_3(request):    
+    return render(request, 'users/news_3.html')
 
 
 class RegisterView(View):
@@ -117,13 +124,48 @@ class ImagePredictionView(LoginRequiredMixin, View):
     def get(self, request):
         image_prediction_list = ImagePrediction.objects.filter(user_id=request.user.id)
         
-        # print("image_prediction_list[0]:", image_prediction_list[0])
-        # print("image_prediction_list[0].__dict__:", image_prediction_list[0].__dict__)
+        config_path = os.path.join(settings.BASE_DIR, "users", "config_dl_vm", "config_dl_vm.json")
+        with open(config_path) as config_file:
+            config_data = json.load(config_file)
+        
+        # Download from cloud AI model API to local storage.
+        config_reader = ConfigReader(file_name = config_data["config_dl_file_name"]) # '/home/nathan/project/ChestXray-Model-API/app/config/config.ini'
+        service_client = initialize_storage_account(config_reader.azure_storage['azure_storage_account_name']
+            ,  config_reader.azure_storage['azure_storage_account_key']
+        )
+        
+        file_system_client = service_client.get_file_system_client(file_system= config_data["file_system_name"])
+        
         for image_prediction_item in image_prediction_list:
-            print(image_prediction_item.timestamp)
+            input_image_file_path = os.path.join(settings.MEDIA_ROOT, image_prediction_item.input_image.__str__()) # /mnt/d/Chest-Xray-Web-App/media/input_images/input_image_10_1.jpg
+            # print("input_image_path:", input_image_path) # True
+            # print("os.path.exists(input_image_path):",os.path.exists(input_image_path))
+            
+            # If input_image is already in local storage.
+            if os.path.exists(input_image_file_path):
+                # Yes: Upload to view -> html
+                print("Input image exists locally, not download from datalake.", input_image_file_path)
+                pass
+            else: # If input_image not in local storage:
+                print("Input image not exists locally, download from datalake.", input_image_file_path)
+                
+                # datalake file path
+                datalake_input_image_file_path =  image_prediction_item.input_image.__str__()
+                input_image_file_client = file_system_client.get_file_client(file_path = datalake_input_image_file_path)
+                
+                # output_path = os.path.join("/home/nathan/project/ChestXray-Model-API/app/", "images_1.jpeg")
+                input_path = input_image_file_path #"/home/Chest-Xray-Web-App/test2.jpeg" # "/mnt/d/Chest-Xray-Web-App/users/azure_dl/test2.jpeg" #/home/Chest-Xray-Web-App
+                with open(input_path,'wb') as local_file:
+                    download= input_image_file_client.download_file()
+                    downloaded_bytes = download.readall()
+                    local_file.write(downloaded_bytes)
+                
+                # Upload to view -> html
+                pass
         
         context = {'image_prediction_list': image_prediction_list} # 'condition_prediction_list' : condition_prediction_list
         return render(request, 'users/prediction.html', context=context)
+    
     
 class ImagePredictionSubmitSuccess(LoginRequiredMixin, View):
     def get(self, request):
@@ -210,7 +252,19 @@ class ImagePredictionUpdate(LoginRequiredMixin, View):
         # print("lastest_timestamp:",lastest_timestamp)
         
         disease_prediction_list = DiseasePrediction.objects.filter(image_prediction_id=image_prediction_item.id, timestamp = lastest_timestamp) #.values()
+        disease_dict = {}
+        for disease_prediction_item in disease_prediction_list:
+            disease_name = disease_prediction_item.disease
+            if disease_name not in disease_dict:
+                disease_dict[disease_name] = []
+                disease_dict[disease_name].append(float(disease_prediction_item.score) *100.0)
+            else:
+                disease_dict[disease_name].append(float(disease_prediction_item.score) *100.0)
+                
+        # print("disease_dict:", disease_dict)
         
+        num_disease_found = len(disease_prediction_list)
+        # print("num_disease_found:", num_disease_found)
         # print(disease_prediction_list)
         
         
@@ -293,7 +347,7 @@ class ImagePredictionUpdate(LoginRequiredMixin, View):
         # print(image_prediction_item.output_image)
         # print(image_prediction_item.output_image.url)
         
-        ctx = {"image_prediction_item": image_prediction_item, "disease_prediction_list": disease_prediction_list}
+        ctx = {"image_prediction_item": image_prediction_item, "disease_prediction_list": disease_prediction_list, "disease_dict": disease_dict, "num_disease_found": num_disease_found}
         return render(request, self.template, ctx)
 
 

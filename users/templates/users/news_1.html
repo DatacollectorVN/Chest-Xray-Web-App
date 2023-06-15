@@ -1,0 +1,97 @@
+{% extends "users/base.html" %}
+
+{% block banner %}  
+    <div style="display: inline-flex" > 
+        <img src="../../../../media/iu_logo.png" alt="IU logo" width="20%" height="20%">
+        <img src="../../../../media/bme_logo.jpg" alt="BME logo" width="20%" height="20%">
+    </div>
+{% endblock banner %}
+
+{% block title %} News 1 Page {% endblock title%}
+{% block content %}
+    <div class="container">
+        <div class="row"> 
+            <div class="col-8"> 
+                <div class="py-2"> 
+                    <h1> This is the title of news #1 </h1>
+                    <p class="lead" style="font-size: 12px;  font-style: italic;"> 08/06/2023 </p>
+                </div>
+
+
+                <p> 
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent pharetra finibus neque ac sodales. 
+                    Pellentesque tempus nibh ut sem vestibulum, quis porta eros iaculis. In vehicula volutpat consectetur. 
+                    Quisque vel ex ex. Mauris lorem tellus, fermentum vitae blandit eu, hendrerit ac nulla. 
+                    Ut facilisis odio ac mauris venenatis, quis dignissim nunc ultrices. 
+                    Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Fusce et ultrices erat. 
+                </p>
+
+                <p> 
+                    Donec ac euismod turpis. Proin nec finibus nisi. Curabitur in mauris vel neque scelerisque convallis vitae ac ante. 
+                    Sed ut diam viverra, euismod mi non, tincidunt tortor. Fusce interdum porta ligula nec interdum. 
+                    Curabitur posuere, diam sed molestie dignissim, urna mauris posuere nibh, iaculis fermentum augue turpis eu sem. 
+                    Maecenas et mi quis diam venenatis tincidunt a vel tellus. Suspendisse id iaculis nibh, sit amet semper dolor. 
+                    Praesent rutrum consequat sapien. Nullam accumsan vehicula ornare. Duis risus tellus, pellentesque at quam nec, mattis pretium diam. 
+                    Mauris sed purus quis massa venenatis ultricies ac id augue.
+                </p>
+
+                <div class="d-flex justify-content-center">
+                    <img  src="https://picsum.photos/id/237/200/300" height="30%" width="50%">
+                </div>
+
+                <div class="d-flex justify-content-center">
+                    <h6> Lorem ipsum dolor sit amet, consectetur adipiscing elit. </h6>
+                </div>
+
+                {% comment %} <h6> Lorem ipsum dolor sit amet, consectetur adipiscing elit. </h6> {% endcomment %}
+
+                <p>
+                    Praesent vel ex in metus congue vestibulum vel a purus. Nulla porta justo a est elementum efficitur. 
+                    In molestie vulputate quam ac elementum. Maecenas mi ligula, ornare ac egestas vel, interdum dignissim enim. 
+                    Aliquam posuere ipsum eros, in luctus turpis iaculis eu. Aliquam viverra magna at turpis congue finibus. 
+                    Aliquam metus turpis, laoreet ac velit at, sollicitudin mollis sapien. Duis tincidunt arcu non tempus maximus. 
+                    Maecenas metus arcu, imperdiet sed viverra eget, finibus ut metus. Nam quis turpis ipsum. Morbi congue risus a faucibus pretium. 
+                    Etiam sed posuere sem. Morbi ultricies mauris non ante laoreet, sed laoreet sem fringilla. 
+                    Duis dapibus enim in enim tincidunt, at sagittis magna malesuada. Vestibulum quis congue mi.
+                </p>
+                
+                <p> 
+                    Nulla velit magna, molestie vel urna vitae, sollicitudin fringilla ligula. 
+                    Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. 
+                    Cras non pulvinar ipsum, a sollicitudin sapien. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. 
+                    Maecenas porttitor ipsum pulvinar, auctor lorem sit amet, tincidunt tellus. Aliquam ut vulputate quam. 
+                    Morbi porttitor neque nisl, at tincidunt mauris ultricies vel. 
+                    Sed id tortor vel libero aliquam euismod. Integer lobortis massa nunc, eu vulputate nisl suscipit non. 
+                    Nulla tempus velit et molestie suscipit. Nullam mollis, odio non dictum efficitur, enim odio rhoncus tellus, vel tempor nibh orci quis turpis. 
+                    Maecenas sed elit porttitor, sodales nisl sit amet, suscipit tellus.
+                </p>
+            </div>
+
+            <div class="col-4">
+                <h5 class="my-2"> News list </h5>
+                <ul class="list-group my-2">
+                    <li class="list-group-item py-1 my-1 px-0 align-items-center border-top-0 border-left-0 border-right-0">
+                        <h6> <a href="{% url 'news_1' %}" style="color:black; text-decoration : none" onmouseover="this.style.color='blue';" onmouseout="this.style.color='black';"> Lorem ipsum dolor sit amet, consectetur adipiscing elit. </a> </h6>
+                        <p class="lead mb-1" style="font-size: 12px;  font-style: italic;"> 08/06/2023 </p>
+                    </li>
+
+                    {% comment %} <hr> {% endcomment %}
+
+                    <li class="list-group-item py-1 my-1 px-0 align-items-center border-top-0 border-left-0 border-right-0">
+                        <h6> <a href="{% url 'news_2' %}" style="color:black; text-decoration : none" onmouseover="this.style.color='blue';" onmouseout="this.style.color='black';"> Lorem ipsum dolor sit amet, consectetur adipiscing elit. </a> </h6>
+                        <p class="lead mb-1" style="font-size: 12px;  font-style: italic;"> 09/06/2023 </p>
+                    </li>
+
+                    {% comment %} <hr> {% endcomment %}
+
+                    <li class="list-group-item py-1 my-1 px-0 align-items-center border-0">
+                        <h6> <a href="{% url 'news_3' %}" style="color:black; text-decoration : none" onmouseover="this.style.color='blue';" onmouseout="this.style.color='black';"> Lorem ipsum dolor sit amet, consectetur adipiscing elit. </a> </h6>
+                        <p class="lead mb-1" style="font-size: 12px;  font-style: italic;"> 10/06/2023 </p>
+                    </li>
+                </ul>
+                
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}
