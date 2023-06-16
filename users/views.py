@@ -14,7 +14,7 @@ from django.conf import settings
 from .forms import RegisterForm, LoginForm, UpdateUserForm, UpdateProfileForm, ImagePredictionForm
 from .models import ImagePrediction, DiseasePrediction
 
-from .azure_dl.config.config_reader import ConfigReader
+from .azure_dl.config.config_reader import config_reader
 from .azure_dl.connectors.azure_dl import initialize_storage_account
 
 def home(request):
@@ -129,7 +129,7 @@ class ImagePredictionView(LoginRequiredMixin, View):
             config_data = json.load(config_file)
         
         # Download from cloud AI model API to local storage.
-        config_reader = ConfigReader(file_name = config_data["config_dl_file_name"]) # '/home/nathan/project/ChestXray-Model-API/app/config/config.ini'
+        # config_reader = ConfigReader(file_name = config_data["config_dl_file_name"]) # '/home/nathan/project/ChestXray-Model-API/app/config/config.ini'
         service_client = initialize_storage_account(config_reader.azure_storage['azure_storage_account_name']
             ,  config_reader.azure_storage['azure_storage_account_key']
         )
@@ -216,7 +216,7 @@ class ImagePredictionCreate(LoginRequiredMixin, View):
         with open(config_path) as config_file:
             config_data = json.load(config_file) 
         
-        config_reader = ConfigReader(file_name = config_data["config_dl_file_name"]) # '/home/nathan/project/ChestXray-Model-API/app/config/config.ini'
+        # config_reader = ConfigReader(file_name = config_data["config_dl_file_name"]) # '/home/nathan/project/ChestXray-Model-API/app/config/config.ini'
         service_client = initialize_storage_account(config_reader.azure_storage['azure_storage_account_name']
             ,  config_reader.azure_storage['azure_storage_account_key']
         )
@@ -291,7 +291,7 @@ class ImagePredictionUpdate(LoginRequiredMixin, View):
                 config_data = json.load(config_file)
             
             # Download from cloud AI model API to local storage.
-            config_reader = ConfigReader(file_name = config_data["config_dl_file_name"]) # '/home/nathan/project/ChestXray-Model-API/app/config/config.ini'
+            # config_reader = ConfigReader(file_name = config_data["config_dl_file_name"]) # '/home/nathan/project/ChestXray-Model-API/app/config/config.ini'
             service_client = initialize_storage_account(config_reader.azure_storage['azure_storage_account_name']
                 ,  config_reader.azure_storage['azure_storage_account_key']
             )
@@ -324,7 +324,7 @@ class ImagePredictionUpdate(LoginRequiredMixin, View):
                 config_data = json.load(config_file)
             
             # Download from cloud AI model API to local storage.
-            config_reader = ConfigReader(file_name = config_data["config_dl_file_name"]) # '/home/nathan/project/ChestXray-Model-API/app/config/config.ini'
+            # config_reader = ConfigReader(file_name = config_data["config_dl_file_name"]) # '/home/nathan/project/ChestXray-Model-API/app/config/config.ini'
             service_client = initialize_storage_account(config_reader.azure_storage['azure_storage_account_name']
                 ,  config_reader.azure_storage['azure_storage_account_key']
             )

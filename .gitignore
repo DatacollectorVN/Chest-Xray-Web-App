@@ -1,11 +1,9 @@
 **/__pycache__
 env/
 note.txt
-media/profile_images/
-media/input_images/
-media/live_voquangtran28101999.jpg
-media/media/
+media/profile_images/**
+media/input_images/**
+media/output_images/**
 users/try.py
 users/azure_dl/output_image_10_1.jpg
 users/azure_dl/output_image_9_1.jpg
-media/output_images/*
