@@ -1,5 +1,4 @@
 {
-    "config_dl_file_name": "/mnt/d/Chest-Xray-Web-App/users/azure_dl/config/config.ini",
     "file_system_name": "prediction", 
     "file_path": null, 
     "input_folder_path": "input_images",
