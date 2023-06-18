@@ -17,7 +17,6 @@ class Profile(models.Model):
     
     avatar = models.ImageField(default='default_avatar.png', upload_to='profile_images') #, storage=OverwriteStorage()) #upload_to=user_directory_path, #upload_to='profile_images', # storage=OverwriteStorage()
     bio = models.TextField()
-    bio2 = models.TextField(default=None, blank=True, null=True)
 
     def __str__(self):
         return self.user.username
