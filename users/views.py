@@ -10,9 +10,10 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.views import View
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .forms import RegisterForm, LoginForm, UpdateUserForm, UpdateProfileForm, ImagePredictionForm
-from .models import ImagePrediction, DiseasePrediction
+from .models import ImagePrediction, DiseasePrediction, Profile
 
 from .azure_dl.config.config_reader import config_reader
 from .azure_dl.connectors.azure_dl import initialize_storage_account
@@ -102,24 +103,128 @@ class ChangePasswordView(SuccessMessageMixin, PasswordChangeView):
     success_url = reverse_lazy('users-home')
 
 
-@login_required
-def profile(request):
-    if request.method == 'POST':
-        user_form = UpdateUserForm(request.POST, instance=request.user)
-        profile_form = UpdateProfileForm(request.POST, request.FILES, instance=request.user.profile)
+# @login_required
+# def profile(request):
+#     if request.method == 'POST':
+#         user_form = UpdateUserForm(request.POST, instance=request.user)
+#         profile_form = UpdateProfileForm(request.POST, request.FILES, instance=request.user.profile)
 
-        if user_form.is_valid() and profile_form.is_valid():
-            user_form.save()
-            profile_form.save()
-            messages.success(request, 'Your profile is updated successfully')
-            return redirect(to='users-profile')
-    else:
+#         if user_form.is_valid() and profile_form.is_valid():
+#             user_form.save()
+#             profile_form.save()
+#             messages.success(request, 'Your profile is updated successfully')
+#             return redirect(to='users-profile')
+#     else:
+#         user_form = UpdateUserForm(instance=request.user)
+#         profile_form = UpdateProfileForm(instance=request.user.profile)
+
+#     return render(request, 'users/profile.html', {'user_form': user_form, 'profile_form': profile_form})
+
+class ProfileView(LoginRequiredMixin, View):
+    def get(self, request):
         user_form = UpdateUserForm(instance=request.user)
         profile_form = UpdateProfileForm(instance=request.user.profile)
+        
+        profile_item = Profile.objects.filter(user_id=request.user.id)[0]        
+        profile_avatar_file_path = os.path.join(settings.MEDIA_ROOT, profile_item.avatar.__str__())
+        
+        # If profile_avatar is already in local storage.
+        if os.path.exists(profile_avatar_file_path):
+            # Yes: Upload to view -> html
+            print("Profile avatar exists locally, not download from datalake.")
+            pass
+        else:  # If profile_avatar is not in local storage.
+            print("Profile avatar not exists locally, download from datalake.")
 
-    return render(request, 'users/profile.html', {'user_form': user_form, 'profile_form': profile_form})
+            config_path = os.path.join(settings.BASE_DIR, "users", "config_dl_vm", "config_dl_vm.json")
+            with open(config_path) as config_file:
+                config_data = json.load(config_file)
+                
+            # Download from cloud AI model API to local storage.
+            # config_reader = ConfigReader(file_name = config_data["config_dl_file_name"]) # '/home/nathan/project/ChestXray-Model-API/app/config/config.ini'
+            service_client = initialize_storage_account(config_reader.azure_storage['azure_storage_account_name']
+                ,  config_reader.azure_storage['azure_storage_account_key']
+            )
+            
+            file_system_client = service_client.get_file_system_client(file_system= config_data["user_avatar_file_system_name"])
+            
+            # datalake file path
+            datalake_profile_avatar_file_path =  profile_item.avatar.__str__()
+            profile_avatar_file_client = file_system_client.get_file_client(file_path = datalake_profile_avatar_file_path)
+        
+            # print("datalake_profile_avatar_file_path:", datalake_profile_avatar_file_path)
+            
+            profile_avatar_path = profile_avatar_file_path  #profile_images/avatar_4.jpg  #"/home/Chest-Xray-Web-App/test2.jpeg" # "/mnt/d/Chest-Xray-Web-App/users/azure_dl/test2.jpeg" #/home/Chest-Xray-Web-App
+            with open(profile_avatar_path,'wb') as local_file:
+                download= profile_avatar_file_client.download_file()
+                downloaded_bytes = download.readall()
+                local_file.write(downloaded_bytes)
+            
+            # Upload to view -> html
+            pass
+        
+        return render(request, 'users/profile.html', {'user_form': user_form, 'profile_form': profile_form})
+    
+    
+        
+    def post(self, request):
+        ### Old code
+        # user_form = UpdateUserForm(request.POST, instance=request.user)
+        # profile_form = UpdateProfileForm(request.POST, request.FILES, instance=request.user.profile)
+        
+        # if user_form.is_valid() and profile_form.is_valid():
+        #     user_form.save()
+        #     profile_form.save()
+        #     messages.success(request, 'Your profile is updated successfully')
+        #     return redirect(to='users-profile')
+        
+        # return render(request, 'users/profile.html', {'user_form': user_form, 'profile_form': profile_form})
+    
+        ### New code: Rewrite the post method
+        user_form = UpdateUserForm(request.POST, instance=request.user)
+        profile_form = UpdateProfileForm(request.POST, request.FILES, instance=request.user.profile)
+        
+        if (not user_form.is_valid()) or (not profile_form.is_valid()):
+            ctx = {'user_form': user_form, 'profile_form': profile_form}
+            return render(request, 'users/profile.html', ctx)
+        
+        user_form.save()
+        profile_object = profile_form.save()
+        
+        profile_avatar_file_name = os.path.basename(profile_object.avatar.url)
+        profile_avatar_file_ext = os.path.splitext(profile_avatar_file_name)[1]
+        
+        profile_avatar_old_file_path = os.path.join(settings.MEDIA_ROOT, profile_object.avatar.__str__())
+        profile_avatar_new_file_path = os.path.join(settings.MEDIA_ROOT, "profile_images", f"avatar_{profile_object.user_id}" + profile_avatar_file_ext)
+        profile_avatar_new_internal_file_path = os.path.join("profile_images", f"avatar_{profile_object.user_id}" + profile_avatar_file_ext)
+        os.replace(profile_avatar_old_file_path, profile_avatar_new_file_path)
+        
+        profile_object.avatar = profile_avatar_new_internal_file_path
+        profile_object.save()
+        
+        ############### Upload image to Azure Datalake ###################################################
+        config_path = os.path.join(settings.BASE_DIR, "users", "config_dl_vm", "config_dl_vm.json")
+        with open(config_path) as config_file:
+            config_data = json.load(config_file) 
+        
+        # config_reader = ConfigReader(file_name = config_data["config_dl_file_name"]) # '/home/nathan/project/ChestXray-Model-API/app/config/config.ini'
+        service_client = initialize_storage_account(config_reader.azure_storage['azure_storage_account_name']
+            ,  config_reader.azure_storage['azure_storage_account_key']
+        )
 
-from django.contrib.auth.mixins import LoginRequiredMixin
+        file_system_client = service_client.get_file_system_client(file_system=config_data["user_avatar_file_system_name"])   
+        directory_client = service_client.get_directory_client(file_system_client.file_system_name, config_data["avatar_folder_path"]) # "chest_xray"
+        
+        image_path = os.path.join(settings.MEDIA_ROOT, profile_object.avatar.__str__())
+        image_name = os.path.basename(image_path) 
+        with open(image_path, "rb") as file: #"/home/Chest-Xray-Web-App/test2.jpeg"
+            file_system_client = directory_client.create_file(image_name) #"test2.jpeg"
+            file_system_client.upload_data(file,  overwrite=True)
+                
+        messages.success(request, 'Your profile is updated successfully')
+        return redirect(to='users-profile')
+        
+
 class ImagePredictionView(LoginRequiredMixin, View):
     def get(self, request):
         image_prediction_list = ImagePrediction.objects.filter(user_id=request.user.id)
@@ -182,7 +287,7 @@ class ImagePredictionCreate(LoginRequiredMixin, View):
         ctx = {'image_prediction_form': image_prediction_form}
         return render(request, self.template, ctx)
     
-    def post(self, request): #Working on
+    def post(self, request): 
         image_prediction_form = ImagePredictionForm(request.POST, request.FILES)
         
         

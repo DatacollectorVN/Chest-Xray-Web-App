@@ -15,7 +15,7 @@ class Profile(models.Model):
     # If an user is deleted, the correponding model will be deleted, too.
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     
-    avatar = models.ImageField(default='default.jpg', upload_to=user_profile_directory_path) #, storage=OverwriteStorage()) #upload_to=user_directory_path, #upload_to='profile_images', # storage=OverwriteStorage()
+    avatar = models.ImageField(default='default_avatar.png', upload_to='profile_images') #, storage=OverwriteStorage()) #upload_to=user_directory_path, #upload_to='profile_images', # storage=OverwriteStorage()
     bio = models.TextField()
     bio2 = models.TextField(default=None, blank=True, null=True)
 
