@@ -91,6 +91,25 @@ class DiseasePrediction(models.Model):
     
     class Meta:
         db_table = "users_disease_prediction"
+        
+        
+class Traffic(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(editable=False)
+    date_key = models.IntegerField(default=None, blank=True, null=True)
+    
+    def save(self, *args, **kwargs):
+        self.timestamp = timezone.now()        
+        self.date_key = int(self.timestamp.strftime("%Y%m%d"))
+        
+        super(Traffic, self).save(*args, **kwargs) # Call the "real" save() method.
+        
+    def __str__(self) -> str:
+        return str(self.user.id) + " " + str(self.timestamp)
+    
+    class Meta:
+        db_table = "users_traffic"
+        
     
 class DummyModel(models.Model):
     x = models.IntegerField(default=0)

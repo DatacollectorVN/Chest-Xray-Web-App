@@ -1,8 +1,8 @@
 from django.urls import path
-from .views import home, ProfileView, RegisterView, ImagePredictionView, ImagePredictionCreate, ImagePredictionUpdate, ImagePredictionDelete, ImagePredictionSubmitSuccess, test, news_1, news_2, news_3
+from .views import HomeView, ProfileView, RegisterView, ImagePredictionView, ImagePredictionCreate, ImagePredictionUpdate, ImagePredictionDelete, ImagePredictionSubmitSuccess, test, news_1, news_2, news_3
 
 urlpatterns = [
-    path('', home, name='users-home'),
+    path('', HomeView.as_view(), name='users-home'),
     path('register/', RegisterView.as_view(), name='users-register'),
     path('profile/', ProfileView.as_view(), name='users-profile'),
     path('prediction/', ImagePredictionView.as_view(), name='image_prediction_all'),
