@@ -24,8 +24,9 @@ from .azure_dl.connectors.azure_dl import initialize_storage_account
 class HomeView(View):
     def get(self, request):
         # Tracking number of traffics
-        new_traffic = Traffic(user=request.user)
-        new_traffic.save()
+        if request.user.is_authenticated:
+            new_traffic = Traffic(user=request.user)
+            new_traffic.save()
         
         # traffic_list = Traffic.objects.all()
         # traffic_count = Traffic.objects.count()
