@@ -13,13 +13,27 @@ from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .forms import RegisterForm, LoginForm, UpdateUserForm, UpdateProfileForm, ImagePredictionForm
-from .models import ImagePrediction, DiseasePrediction, Profile
+from .models import ImagePrediction, DiseasePrediction, Profile, Traffic
 
 from .azure_dl.config.config_reader import config_reader
 from .azure_dl.connectors.azure_dl import initialize_storage_account
 
-def home(request):
-    return render(request, 'users/home.html')
+# def home(request):
+#     return render(request, 'users/home.html')
+
+class HomeView(View):
+    def get(self, request):
+        # Tracking number of traffics
+        new_traffic = Traffic(user=request.user)
+        new_traffic.save()
+        
+        # traffic_list = Traffic.objects.all()
+        traffic_count = Traffic.objects.count()
+        # print("traffic_list:",traffic_list)
+        # print("traffic_count:", traffic_count)
+        ctx = {"traffic_count": traffic_count}
+        
+        return render(request, 'users/home.html', context=ctx)
 
 def test(request):
     return render(request, 'users/test.html')
