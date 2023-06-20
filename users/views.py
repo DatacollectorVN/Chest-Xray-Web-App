@@ -24,16 +24,16 @@ from .azure_dl.connectors.azure_dl import initialize_storage_account
 class HomeView(View):
     def get(self, request):
         # Tracking number of traffics
-        new_traffic = Traffic(user=request.user)
-        new_traffic.save()
+        if request.user.is_authenticated:
+            new_traffic = Traffic(user=request.user)
+            new_traffic.save()
         
         # traffic_list = Traffic.objects.all()
-        traffic_count = Traffic.objects.count()
+        # traffic_count = Traffic.objects.count()
+        
         # print("traffic_list:",traffic_list)
         # print("traffic_count:", traffic_count)
-        ctx = {"traffic_count": traffic_count}
-        
-        return render(request, 'users/home.html', context=ctx)
+        return render(request, 'users/home.html')
 
 def test(request):
     return render(request, 'users/test.html')
