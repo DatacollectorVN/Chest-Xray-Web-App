@@ -4,9 +4,6 @@ from PIL import Image
 from django.core.exceptions import ObjectDoesNotExist
 import os
 from datetime import datetime
-
-from .image_save_utils import user_profile_directory_path     
-# from .storage import OverwriteStorage
 from django.utils import timezone
 
 

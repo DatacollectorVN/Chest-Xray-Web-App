@@ -6,6 +6,10 @@ from .models import Profile, ImagePrediction, DummyModel, DiseasePrediction, Tra
 
 
 class RegisterForm(UserCreationForm):
+    """ 
+    
+    """
+    
     # fields we want to include and customize in our form
     first_name = forms.CharField(max_length=100,
                                  required=True,
