@@ -9,12 +9,12 @@
 
 {% block title %} Home Page {% endblock title%}
 {% block content %}
-    <div class="jumbotron">        
-        <h1 class="display-4">Welcome, {{user.first_name.title|default:'Guest'}}</h1>
-        <p class="lead">
+    <div class="jumbotron p-5">        
+        <p class="display-4 h2">Welcome, {{user.first_name.title|default:'Guest'}}</p>
+        <p class="lead h3">
             This is Chest X-ray Web Application version 2, from BME-IU.
         </p>
-        <hr class="my-4">
+        {% comment %} <hr class="my-4"> {% endcomment %}
     </div>
 
     <div class="container">

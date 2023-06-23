@@ -9,20 +9,51 @@
 
 {% block title %} Prediction Page {% endblock title%}
 {% block content %}
-    <h1> Successful submission. </h1>
-    <button type="button" class="btn btn-primary btn-sm" onclick="window.location='{% url 'image_prediction_all' %}'"> Return to Prediction History </button>
-    {% comment %} <h1> Image Prediction Section </h1>
-    <div style="display: flex; flex-direction: row; margin: 10px"> 
-      <div>
-        <p> Input image: </p>
-        <img src="{{image_prediction_item.input_image.url}}" width="400" height="400" />
-      </div>
-      <hr>
-      <div>
-        <p> Output image: </p>
+    <div class="container"> 
+      <div class="row pt-5">
+        <div class="col-4">
+        </div>
 
-        <img src="{{image_prediction_item.output_image.url}}" width="400" height="400" />
+        <div class="col-4">
+            {% comment %} <div class="h4"> Successful submission. </div>
+
+            <button type="button" class="btn btn-primary btn-sm" onclick="window.location='{% url 'image_prediction_all' %}'"> 
+              <div class="h6">
+                Return to Prediction History 
+              </div>
+            </button> {% endcomment %}
+
+            <div class="card" style="width: 18rem;">
+              <div class="card-body">
+              <p class="card-title h5" align="center">Successful submission</p>
+              <p class="card-text" align="justify">
+                Please wait until the prediction status is complete, and then refresh the prediction history page.
+              </p>
+              {% comment %} <br> {% endcomment %}
+              {% comment %} <hr>
+                <div class="d-flex justify-content-center"> 
+                    <a href="{% url 'login' %}" class="btn btn-primary">Sign in again</a>
+                </div> {% endcomment %}
+
+              {% comment %} <hr> {% endcomment %}
+              
+                <div class="d-flex justify-content-center">
+                  <button type="button" class="btn btn-primary btn-sm" onclick="window.location='{% url 'image_prediction_all' %}'"> 
+                    <div class="h6 d-flex justify-content-center" style="text-align: center;">
+                      Return to Prediction History 
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </div>
+        </div>
+
+        <div class="col-4">
+        </div>
       </div>
-    </div> {% endcomment %}
+    </div>
+
+    
+
     
 {% endblock %}
