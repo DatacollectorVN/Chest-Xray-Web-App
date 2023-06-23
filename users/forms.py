@@ -2,12 +2,13 @@ from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 
-from .models import Profile, ImagePrediction, DummyModel, DiseasePrediction, Traffic
+from .models import Profile, ImagePrediction, DiseasePrediction, Traffic
 
 
 class RegisterForm(UserCreationForm):
     """ 
-    
+    Form to create new user in User model, at register page - RegisterView - register.html
+    Fields: firstname, lastname, username, email, password1, password2
     """
     
     # fields we want to include and customize in our form
@@ -51,6 +52,10 @@ class RegisterForm(UserCreationForm):
 
 
 class LoginForm(AuthenticationForm):
+    """ 
+    Form to login, at login page - CustomLoginView - login.html
+    Fields: username, password, remember_me
+    """
     username = forms.CharField(max_length=100,
                                required=True,
                                widget=forms.TextInput(attrs={'placeholder': 'User Name',
@@ -72,6 +77,11 @@ class LoginForm(AuthenticationForm):
 
 
 class UpdateUserForm(forms.ModelForm):
+    """ 
+    Form to retrieve and update user's email and username in profile page - ProfileView - profile.html
+    Fields: username, email
+    """
+    
     username = forms.CharField(max_length=100,
                                required=True,
                                widget=forms.TextInput(attrs={'class': 'form-control'}))
@@ -84,6 +94,10 @@ class UpdateUserForm(forms.ModelForm):
 
 
 class UpdateProfileForm(forms.ModelForm):
+    """ 
+    Form retrieve and update user's profile from Profile model in profile page - ProfileView - profile.html
+    Fields: avatar, bio
+    """
     avatar = forms.ImageField(widget=forms.FileInput(attrs={'class': 'form-control-file'}))
     bio = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 5}))
 
@@ -97,6 +111,10 @@ MODALITY_CHOICES= [
     ]
 
 class ImagePredictionForm(forms.ModelForm):
+    """ 
+    Form to create user's image prediction to ImagePredictionModel in prediction history page - ImagePredictionCreate view - prediction_form.html
+    Fields: category, input_image
+    """
     category = forms.CharField(required=True, label='Modality', widget=forms.Select(attrs={'class': 'form-control'}, choices=MODALITY_CHOICES))
     input_image = forms.ImageField(required=True, widget=forms.FileInput(attrs={'class': 'form-control-file'}))
     
@@ -105,16 +123,3 @@ class ImagePredictionForm(forms.ModelForm):
         fields = ['category', 'input_image']
         exclude = ['user']
         
-# class TrafficForm(forms.ModelForm):
-#     class Meta:
-#         model = Traffic
-#         fields = ["user"]
-
-        
-class DummyForm(forms.ModelForm):
-    x = forms.IntegerField()
-    x_image = forms.ImageField(widget=forms.FileInput(attrs={'class': 'form-control-file'}))
-    
-    class Meta:
-        model = DummyModel
-        fields = ["x", "x_image"]

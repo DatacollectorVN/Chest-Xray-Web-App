@@ -9,6 +9,13 @@ from django.utils import timezone
 
 # Extending User Model Using a One-To-One Link
 class Profile(models.Model):
+    """ 
+    This entity represent user's profile. It has three attributes:
+        id: primary key (implicit)
+        user_id: foreign key, linked to User entity
+        avatar: patient's avatar image
+        bio: patient's self-description
+    """
     # If an user is deleted, the correponding model will be deleted, too.
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     
@@ -26,28 +33,22 @@ class Profile(models.Model):
 # class Prediction
 class ImagePrediction(models.Model):
     """ 
-    This entity represent disease prediction, it has four attributes:
+    This entity represent image prediction, it has seven attributes:
         id: primary key (implicit)
         user_id: foreign key, linked to User entity
         category: type of medical image, default: x_ray
-        url: link of medical image, currently saved in local, later: saved to datalake
-        timestamp
-        date_key
+        input_image: url of input image in local storage and on data lake
+        output_image: url of ouput image in local storage and on data lake        
+        timestamp: datetime when an entry is created
+        date_key: date of timestamp as integer key for query purposes
     """
-    # from django.conf import settings
-    user = models.ForeignKey(User, on_delete=models.CASCADE) #settings.AUTH_USER_MODEL  ???
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     category = models.TextField(default=None, blank=True, null=True)
-    # input_url = models.URLField(default=None, blank=True, null=True) #image url
-    # output_url = models.URLField(default=None, blank=True, null=True) 
     input_image = models.ImageField(default='default.jpg', upload_to="input_images") 
     output_image = models.ImageField(default='output_image_default.jpg', upload_to="output_images") 
     
     timestamp = models.DateTimeField(editable=False)
     date_key = models.IntegerField(default=None, blank=True, null=True)
-    
-    # https://stackoverflow.com/questions/8016412/in-django-do-models-have-a-default-timestamp-field
-    # created_at = models.DateField(auto_now_add=True)
-    # updated_at = models.DateTimeField(auto_now=True)
     
     # Result of AI model's prediction.
     status = models.TextField(default="In progress", blank=True, null=True)
@@ -68,6 +69,17 @@ class ImagePrediction(models.Model):
         db_table = "users_image_prediction"
     
 class DiseasePrediction(models.Model):
+    """ 
+    This entity represent disease prediction, it has 8 attributes:
+        id: primary key (implicit)
+        user_id: foreign key, linked to User entity
+        timestamp: datetime when an entry is created
+        date_key: date of timestamp as integer key for query purposes
+        image_prediction: foreign key, linked to ImagePrediction entity
+        disease: disease name
+        location_xyxy: location of that disease on resultant image
+        score: confidence score of AI model on that prediction
+    """
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(editable=False)
     date_key = models.IntegerField(default=None, blank=True, null=True)
@@ -91,6 +103,13 @@ class DiseasePrediction(models.Model):
         
         
 class Traffic(models.Model):
+    """ 
+    This entity represent traffic - a login of an user to homepage, it has 4 attributes:
+        id: primary key (implicit)
+        user_id: foreign key, linked to User entity
+        timestamp: datetime when an entry is created
+        date_key: date of timestamp as integer key for query purposes
+    """
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(editable=False)
     date_key = models.IntegerField(default=None, blank=True, null=True)
@@ -108,10 +127,5 @@ class Traffic(models.Model):
         db_table = "users_traffic"
         
     
-class DummyModel(models.Model):
-    x = models.IntegerField(default=0)
-    x_image = models.ImageField(default='default.jpg', upload_to="input_images") #, storage=OverwriteStorage()) #upload_to=user_directory_path, #upload_to='profile_images', # storage=OverwriteStorage()
 
-    def __str__(self):
-        return str(self.x)
     
