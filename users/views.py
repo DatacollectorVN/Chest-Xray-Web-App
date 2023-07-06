@@ -409,17 +409,21 @@ class ImagePredictionUpdate(LoginRequiredMixin, View):
         image_prediction_item = get_object_or_404(self.image_prediction_model, pk=pk)
         lastest_timestamp = DiseasePrediction.objects.filter(image_prediction_id=image_prediction_item.id).order_by('-timestamp')[0].timestamp
         disease_prediction_list = DiseasePrediction.objects.filter(image_prediction_id=image_prediction_item.id, timestamp = lastest_timestamp) #.values()
-        disease_dict = {}
+        disease_dict = {}        
+        
+        num_disease_found = 0
         for disease_prediction_item in disease_prediction_list:
             disease_name = disease_prediction_item.disease
-            if disease_name not in disease_dict:
-                disease_dict[disease_name] = []
-                disease_dict[disease_name].append(float(disease_prediction_item.score) *100.0)
-            else:
-                disease_dict[disease_name].append(float(disease_prediction_item.score) *100.0)
+            if disease_name:
+                num_disease_found += 1
+                if disease_name not in disease_dict:
+                    disease_dict[disease_name] = []
+                    disease_dict[disease_name].append(float(disease_prediction_item.score) *100.0)
+                else:
+                    disease_dict[disease_name].append(float(disease_prediction_item.score) *100.0)
 
-        num_disease_found = len(disease_prediction_list)
-        
+        # num_disease_found = len(disease_prediction_list)
+
         input_image_file_path = os.path.join(settings.MEDIA_ROOT, image_prediction_item.input_image.__str__())
         output_image_file_path = os.path.join(settings.MEDIA_ROOT, image_prediction_item.output_image.__str__()) 
         
