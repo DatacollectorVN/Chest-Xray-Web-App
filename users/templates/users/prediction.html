@@ -11,13 +11,27 @@
 
 {% block content %}
     
-    <div>
-        <p class="h2 p-3"> Image Prediction List</p>
+    <div class="container">
+        <div class="row">
+            <div class="col-12 d-flex justify-content-between">
+                <p class="h2 py-3"> Image Prediction List</p>
+                <button type="button" class="btn btn-primary btn-lg my-2" onclick="window.location='{% url 'image_prediction_create' %}'">Make a new image prediction</button>
+            </div>
+        </div>
     </div>
-    {% if image_prediction_list %}
+
+    <div>
+       
+    </div>
+    
+    
+    
+    
+    {% comment %} {% if image_prediction_list %} {% endcomment %}
+    {% if page_obj %}
     {% comment %} <div class="overflow-auto">  {% endcomment %}
         <ul class="list-group"> 
-            {% for image_prediction_item in image_prediction_list %}
+            {% for image_prediction_item in page_obj %}
             <div>
                 <li class="list-group-item">
                     {% comment %} <div style="display: flex; flex-direction: row; margin: 10px">  {% endcomment %}
@@ -63,7 +77,47 @@
         {% endif %}
     {% comment %} </div> {% endcomment %}
 
-        <button type="button" class="btn btn-primary btn-lg mt-4" onclick="window.location='{% url 'image_prediction_create' %}'"> Make a new image prediction </button>
+    <br>
+    {% comment %} <br>
+    <br> {% endcomment %}
 
+    <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+          {% comment %} <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+          <li class="page-item"><a class="page-link" href="#">1</a></li>
+          <li class="page-item"><a class="page-link" href="#">2</a></li>
+          <li class="page-item"><a class="page-link" href="#">3</a></li>
+          <li class="page-item"><a class="page-link" href="#">Next</a></li> {% endcomment %}
+            {% comment %} <span class="step-links"> {% endcomment %}
+                {% if page_obj.has_previous %}
+                    <li class="page-item"> 
+                        <a class="page-link" href="?page=1">&laquo; First</a>
+                    </li>
+
+                    <li class="page-item"> 
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                    </li>
+                {% endif %}
+
+                <span class="current">
+                    <li class="page-item disabled"> 
+                        <a class="page-link" href="#">
+                            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+                        </a>
+                    </li>
+                </span>
+
+                {% if page_obj.has_next %}
+                    <li class="page-item"> 
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a>
+                    </li>
+
+                    <li class="page-item"> 
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+                    </li>
+                {% endif %}
+            {% comment %} </span> {% endcomment %}
+        </ul>
+      </nav>
     
 {% endblock %}
