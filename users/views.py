@@ -11,6 +11,7 @@ from django.views import View
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.paginator import Paginator
 
 from .forms import RegisterForm, LoginForm, UpdateUserForm, UpdateProfileForm, ImagePredictionForm
 from .models import ImagePrediction, DiseasePrediction, Profile, Traffic
@@ -259,10 +260,15 @@ class ImagePredictionView(LoginRequiredMixin, View):
         If not, download that image from datalake at prediction/input_images/input_image_{image_prediction_id}_{user_id}.{ext}
         Downloaded input images are located in media/input_images/input_image_{image_prediction_id}_{user_id}.{ext}
         Return prediction.html template with associated information.
-        """
-        
+        """        
         image_prediction_list = ImagePrediction.objects.filter(user_id=request.user.id)
         
+        # Pagination section
+        paginator = Paginator(image_prediction_list, 4) # Show 5 image prediction per page
+        page_number = request.GET.get("page")
+        page_obj = paginator.get_page(page_number)
+        
+        # Download section
         config_path = os.path.join(settings.BASE_DIR, "users", "config_dl_vm", "config_dl_vm.json")
         with open(config_path) as config_file:
             config_data = json.load(config_file)
@@ -274,7 +280,7 @@ class ImagePredictionView(LoginRequiredMixin, View):
         
         file_system_client = service_client.get_file_system_client(file_system= config_data["file_system_name"])
         
-        for image_prediction_item in image_prediction_list:
+        for image_prediction_item in page_obj: #image_prediction_list:
             input_image_file_path = os.path.join(settings.MEDIA_ROOT, image_prediction_item.input_image.__str__()) # /mnt/d/Chest-Xray-Web-App/media/input_images/input_image_10_1.jpg
             
             # If input_image is already in local storage.
@@ -298,8 +304,11 @@ class ImagePredictionView(LoginRequiredMixin, View):
                 
                 # Upload to view -> html
                 pass
+            
+            
+
         
-        context = {'image_prediction_list': image_prediction_list} 
+        context = {'image_prediction_list': image_prediction_list, 'page_obj': page_obj} 
         return render(request, 'users/prediction.html', context=context)
     
     
