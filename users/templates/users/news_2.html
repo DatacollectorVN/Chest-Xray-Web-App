@@ -13,81 +13,202 @@
         <div class="row"> 
             <div class="col-8"> 
                 <div class="py-2"> 
-                    <h1> This is the title of news #2 </h1>
+                    <h1>Azure Solution Architecture</h1>
                     <p class="lead" style="font-size: 12px;  font-style: italic;"> 08/06/2023 </p>
                 </div>
 
-
-                <p> 
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent pharetra finibus neque ac sodales. 
-                    Pellentesque tempus nibh ut sem vestibulum, quis porta eros iaculis. In vehicula volutpat consectetur. 
-                    Quisque vel ex ex. Mauris lorem tellus, fermentum vitae blandit eu, hendrerit ac nulla. 
-                    Ut facilisis odio ac mauris venenatis, quis dignissim nunc ultrices. 
-                    Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Fusce et ultrices erat. 
-                </p>
-
-                <p> 
-                    Donec ac euismod turpis. Proin nec finibus nisi. Curabitur in mauris vel neque scelerisque convallis vitae ac ante. 
-                    Sed ut diam viverra, euismod mi non, tincidunt tortor. Fusce interdum porta ligula nec interdum. 
-                    Curabitur posuere, diam sed molestie dignissim, urna mauris posuere nibh, iaculis fermentum augue turpis eu sem. 
-                    Maecenas et mi quis diam venenatis tincidunt a vel tellus. Suspendisse id iaculis nibh, sit amet semper dolor. 
-                    Praesent rutrum consequat sapien. Nullam accumsan vehicula ornare. Duis risus tellus, pellentesque at quam nec, mattis pretium diam. 
-                    Mauris sed purus quis massa venenatis ultricies ac id augue.
+                <h2>1. Solution architecture</h2>
+                <p>
+                    In the figure 1 below show how this study deploy model on build DL Lifecyle on Azure. 
                 </p>
 
                 <div class="d-flex justify-content-center">
-                    <img  src="https://picsum.photos/id/238/200/300" height="30%" width="50%">
+                    <img  src="../../../../media/report_images/azure/figure1.png" width="100%">  
+                    {% comment %} height="50%" width="50%"> {% endcomment %}
                 </div>
 
-                <div class="d-flex justify-content-center">
-                    <h6> Lorem ipsum dolor sit amet, consectetur adipiscing elit. </h6>
-                </div>
-
-                {% comment %} <h6> Lorem ipsum dolor sit amet, consectetur adipiscing elit. </h6> {% endcomment %}
+                <p class="d-flex justify-content-center"> 
+                    Figure 1. Solution architecture on Azure 
+                </p>
 
                 <p>
-                    Praesent vel ex in metus congue vestibulum vel a purus. Nulla porta justo a est elementum efficitur. 
-                    In molestie vulputate quam ac elementum. Maecenas mi ligula, ornare ac egestas vel, interdum dignissim enim. 
-                    Aliquam posuere ipsum eros, in luctus turpis iaculis eu. Aliquam viverra magna at turpis congue finibus. 
-                    Aliquam metus turpis, laoreet ac velit at, sollicitudin mollis sapien. Duis tincidunt arcu non tempus maximus. 
-                    Maecenas metus arcu, imperdiet sed viverra eget, finibus ut metus. Nam quis turpis ipsum. Morbi congue risus a faucibus pretium. 
-                    Etiam sed posuere sem. Morbi ultricies mauris non ante laoreet, sed laoreet sem fringilla. 
-                    Duis dapibus enim in enim tincidunt, at sagittis magna malesuada. Vestibulum quis congue mi.
+                    Web application use front-end by HTML, CSS, JS, Bootstrap and back-end: Python – Django, 
+                    then deploy application on azure by Azure Web Service via Docker. 
+                    In Azure Web Service support firewall by network security group (NSG) and ability to scalble by Azure service plan. 
+                    In this study is used only single region such as Viet Nam, so just apply vertical scaling with 
+                    Azure web service will increase hardware infrastructure as CPU / RAM / Disk when the high workload. 
                 </p>
-                
+
+                <div class="d-flex justify-content-center">
+                    <img  src="../../../../media/report_images/azure/figure2.png" width="100%">  
+                    {% comment %} height="50%" width="50%"> {% endcomment %}
+                </div>
+
+                <p class="d-flex justify-content-center"> 
+                    Figure 2. Website application 
+                </p>
+
                 <p> 
-                    Nulla velit magna, molestie vel urna vitae, sollicitudin fringilla ligula. 
-                    Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. 
-                    Cras non pulvinar ipsum, a sollicitudin sapien. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. 
-                    Maecenas porttitor ipsum pulvinar, auctor lorem sit amet, tincidunt tellus. Aliquam ut vulputate quam. 
-                    Morbi porttitor neque nisl, at tincidunt mauris ultricies vel. 
-                    Sed id tortor vel libero aliquam euismod. Integer lobortis massa nunc, eu vulputate nisl suscipit non. 
-                    Nulla tempus velit et molestie suscipit. Nullam mollis, odio non dictum efficitur, enim odio rhoncus tellus, vel tempor nibh orci quis turpis. 
-                    Maecenas sed elit porttitor, sodales nisl sit amet, suscipit tellus.
+                    Data lake where store all non-relational data such as image. 
+                    In this study use Data lake to store CXR image corresponding to user by using Azure Blob Storage with Data Lake Gen2 engine. 
                 </p>
+
+                <div class="d-flex justify-content-center">
+                    <img  src="../../../../media/report_images/azure/figure3.png" width="50%">  
+                    {% comment %} height="50%" width="50%"> {% endcomment %}
+                </div>
+
+                <p class="d-flex justify-content-center"> 
+                    Figure 3. Data lake 
+                </p>
+
+                <p>
+                    Database is used to store all relational data such as user information, output of prediction (disease name, disease location, confident score, …)
+                    , CXR information, etc. In this study use Azure SQL Sever for database and apply security group service for increase data security. 
+                </p>
+
+                <div class="d-flex justify-content-center">
+                    <img  src="../../../../media/report_images/azure/figure4.png" width="80%">  
+                    {% comment %} height="50%" width="50%"> {% endcomment %}
+                </div>
+
+                <p class="d-flex justify-content-center"> 
+                    Figure 4. Database 
+                </p>
+
+                <p>
+                    AI hub where is the best model deployment to endpoint and can communicate via RestAPI. 
+                    In this study use Python with FastAPI for deploy model to endpoint and use Azure VM as the server to run this endpoint. 
+                </p>
+
+                <div class="d-flex justify-content-center">
+                    <img  src="../../../../media/report_images/azure/figure5.png" width="80%">  
+                    {% comment %} height="50%" width="50%"> {% endcomment %}
+                </div>
+
+                <p class="d-flex justify-content-center"> 
+                    Figure 5. AI hub 
+                </p>
+
+                <p>
+                    If the backend from web application directly send request to Azure VM in AI hub with many concurrent request such as 100 request. 
+                    Azure VM must process many thing at the same time. Then they can lead to shut down Azure VM or missing some of requests. 
+                    To prevent this case, in this study design distrusted messaging system that can handle each request as message by placing it into queue pipeline. 
+                    And the Azure VM from AI hub can process each message in order without concurrent processing. 
+                    The distributed messaging system is built by using Logic app and storage queue service. 
+                </p>
+
+                <div class="d-flex justify-content-center">
+                    <img  src="../../../../media/report_images/azure/figure6.png" width="100%">  
+                    {% comment %} height="50%" width="50%"> {% endcomment %}
+                </div>
+
+                <p class="d-flex justify-content-center"> 
+                    Figure 6. Distributed messaging system 
+                </p>
+
+                <p>
+                    Data warehouse (DWH) is the same database where store relational database. 
+                    But different with database serve for online-transaction-processing (OLTP), the DWH serve for online-analysis-processing (OLAP), 
+                    that is used for analysis purpose therefore the schema, relationship and organization is different with the way to use database. 
+                    DWH have many layer to storage with staging, Dim, Fact and data mart layer. 
+                    In this study use Azure Data Factory for extract-transform-load (ETL) data between layers in DWH and migrate data from database to staging layer. 
+                </p>
+
+                <div class="d-flex justify-content-center">
+                    <img  src="../../../../media/report_images/azure/figure7.png" width="100%">  
+                    {% comment %} height="50%" width="50%"> {% endcomment %}
+                </div>
+
+                <p class="d-flex justify-content-center"> 
+                    Figure 7. Data Warehouse 
+                </p>
+
+                <p>
+                    Business intelligence is tool to visualize data with analysis purpose. 
+                    In this study is used PowerBI desktop and PowerBI service. 
+                    To establish connection between PowerBI service and data from DWH need a server host work as gateway connection. 
+                    Therefore, this server host is call bastion host by using Azure VM service.  
+                </p>
+
+                <div class="d-flex justify-content-center">
+                    <img  src="../../../../media/report_images/azure/figure8.png" width="100%">  
+                    {% comment %} height="50%" width="50%"> {% endcomment %}
+                </div>
+
+                <p class="d-flex justify-content-center"> 
+                    Figure 8. Business intelligence  
+                </p>
+
+                <h2>2. Result</h2>
+                <p> Logic app structure: </p>
+                <div class="d-flex justify-content-center">
+                    <img  src="../../../../media/report_images/azure/figure9.png" width="100%">  
+                    {% comment %} height="50%" width="50%"> {% endcomment %}
+                </div>
+
+                <p class="d-flex justify-content-center"> 
+                    Figure 9. Logic app 
+                </p>
+
+                <p>Power BI service: </p>
+                <div class="d-flex justify-content-center">
+                    <img  src="../../../../media/report_images/azure/figure10.png" width="100%">  
+                    {% comment %} height="50%" width="50%"> {% endcomment %}
+                </div>
+
+                <p class="d-flex justify-content-center"> 
+                    Figure 10. PowerBI: CXR prediction analysis 
+                </p>
+
+                <div class="d-flex justify-content-center">
+                    <img  src="../../../../media/report_images/azure/figure11.png" width="100%">  
+                    {% comment %} height="50%" width="50%"> {% endcomment %}
+                </div>
+
+                <p class="d-flex justify-content-center"> 
+                    Figure 11. Traffic analysis 
+                </p>
+
+                <p>
+                    Most of recent studies just build ML lifecycle that is hard to apply for deep learning models. 
+                    In this study not only implement model to cloud but also build data pipeline, 
+                    data warehouse and business intelligence that support internal team to analyze, monitor and maintain model overtime. 
+                    Beside that, study’s architecture design the efficient way to capture CXR data from website application and store it into data lake. 
+                    Those CXR can be analyze or label to use it retrain model. 
+                </p>
+
+                <p>
+                    In this architecture easy to integrate another AI models application by building endpoint. 
+                </p>
+
+                <div class="d-flex justify-content-center">
+                    <img  src="../../../../media/report_images/azure/figure12.png" width="50%">  
+                    {% comment %} height="50%" width="50%"> {% endcomment %}
+                </div>
+
+                <p class="d-flex justify-content-center"> 
+                    Figure 12. AI hub scalability 
+                </p>
+            
             </div>
 
             <div class="col-4">
                 <h5 class="my-2"> News list </h5>
                 <ul class="list-group my-2">
                     <li class="list-group-item py-1 my-1 px-0 align-items-center border-top-0 border-left-0 border-right-0">
-                        <h6> <a href="{% url 'news_1' %}" style="color:black; text-decoration : none" onmouseover="this.style.color='blue';" onmouseout="this.style.color='black';"> Lorem ipsum dolor sit amet, consectetur adipiscing elit. </a> </h6>
+                        <h6> <a href="{% url 'news_1' %}" style="color:black; text-decoration : none" onmouseover="this.style.color='blue';" onmouseout="this.style.color='black';">Methodology in chest XRay application</a> </h6>
                         <p class="lead mb-1" style="font-size: 12px;  font-style: italic;"> 08/06/2023 </p>
                     </li>
 
                     {% comment %} <hr> {% endcomment %}
 
                     <li class="list-group-item py-1 my-1 px-0 align-items-center border-top-0 border-left-0 border-right-0">
-                        <h6> <a href="{% url 'news_2' %}" style="color:black; text-decoration : none" onmouseover="this.style.color='blue';" onmouseout="this.style.color='black';"> Lorem ipsum dolor sit amet, consectetur adipiscing elit. </a> </h6>
+                        <h6> <a href="{% url 'news_2' %}" style="color:black; text-decoration : none" onmouseover="this.style.color='blue';" onmouseout="this.style.color='black';">Azure Solution Architecture</a> </h6>
                         <p class="lead mb-1" style="font-size: 12px;  font-style: italic;"> 09/06/2023 </p>
                     </li>
 
                     {% comment %} <hr> {% endcomment %}
-
-                    <li class="list-group-item py-1 my-1 px-0 align-items-center border-0">
-                        <h6> <a href="{% url 'news_3' %}" style="color:black; text-decoration : none" onmouseover="this.style.color='blue';" onmouseout="this.style.color='black';"> Lorem ipsum dolor sit amet, consectetur adipiscing elit. </a> </h6>
-                        <p class="lead mb-1" style="font-size: 12px;  font-style: italic;"> 10/06/2023 </p>
-                    </li>
                 </ul>
                 
             </div>

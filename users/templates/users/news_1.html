@@ -13,81 +13,814 @@
         <div class="row"> 
             <div class="col-8"> 
                 <div class="py-2"> 
-                    <h1> This is the title of news #1 </h1>
+                    <h1> Methodology in chest XRay application </h1>
                     <p class="lead" style="font-size: 12px;  font-style: italic;"> 08/06/2023 </p>
                 </div>
 
-
+                <h2> 1. Dataset </h2>
                 <p> 
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent pharetra finibus neque ac sodales. 
-                    Pellentesque tempus nibh ut sem vestibulum, quis porta eros iaculis. In vehicula volutpat consectetur. 
-                    Quisque vel ex ex. Mauris lorem tellus, fermentum vitae blandit eu, hendrerit ac nulla. 
-                    Ut facilisis odio ac mauris venenatis, quis dignissim nunc ultrices. 
-                    Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Fusce et ultrices erat. 
+                    The original dataset, which consists of 18,000 poster-anterior (PA) CXR scans in DICOM format with a total size of 191.82 GB, was provided directly by VinBigData.
+                    As a result, VinBigData indirectly provided the dataset for this project, which was turned to a 3.4 GB jpeg picture. 
                 </p>
-
-                <p> 
-                    Donec ac euismod turpis. Proin nec finibus nisi. Curabitur in mauris vel neque scelerisque convallis vitae ac ante. 
-                    Sed ut diam viverra, euismod mi non, tincidunt tortor. Fusce interdum porta ligula nec interdum. 
-                    Curabitur posuere, diam sed molestie dignissim, urna mauris posuere nibh, iaculis fermentum augue turpis eu sem. 
-                    Maecenas et mi quis diam venenatis tincidunt a vel tellus. Suspendisse id iaculis nibh, sit amet semper dolor. 
-                    Praesent rutrum consequat sapien. Nullam accumsan vehicula ornare. Duis risus tellus, pellentesque at quam nec, mattis pretium diam. 
-                    Mauris sed purus quis massa venenatis ultricies ac id augue.
-                </p>
-
-                <div class="d-flex justify-content-center">
-                    <img  src="https://picsum.photos/id/237/200/300" height="30%" width="50%">
-                </div>
-
-                <div class="d-flex justify-content-center">
-                    <h6> Lorem ipsum dolor sit amet, consectetur adipiscing elit. </h6>
-                </div>
-
-                {% comment %} <h6> Lorem ipsum dolor sit amet, consectetur adipiscing elit. </h6> {% endcomment %}
 
                 <p>
-                    Praesent vel ex in metus congue vestibulum vel a purus. Nulla porta justo a est elementum efficitur. 
-                    In molestie vulputate quam ac elementum. Maecenas mi ligula, ornare ac egestas vel, interdum dignissim enim. 
-                    Aliquam posuere ipsum eros, in luctus turpis iaculis eu. Aliquam viverra magna at turpis congue finibus. 
-                    Aliquam metus turpis, laoreet ac velit at, sollicitudin mollis sapien. Duis tincidunt arcu non tempus maximus. 
-                    Maecenas metus arcu, imperdiet sed viverra eget, finibus ut metus. Nam quis turpis ipsum. Morbi congue risus a faucibus pretium. 
-                    Etiam sed posuere sem. Morbi ultricies mauris non ante laoreet, sed laoreet sem fringilla. 
-                    Duis dapibus enim in enim tincidunt, at sagittis magna malesuada. Vestibulum quis congue mi.
+                    This dataset is entirely Vietnamese and consists of 3,000 pictures for algorithm model evaluation and 15,000 photos for training chest X-rays. 
+                    Data were gathered from the Hanoi Medical University Hospital and the 108 Military Central Hospital. Leading radiologists analyze and diagnose each picture. 
                 </p>
                 
-                <p> 
-                    Nulla velit magna, molestie vel urna vitae, sollicitudin fringilla ligula. 
-                    Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. 
-                    Cras non pulvinar ipsum, a sollicitudin sapien. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. 
-                    Maecenas porttitor ipsum pulvinar, auctor lorem sit amet, tincidunt tellus. Aliquam ut vulputate quam. 
-                    Morbi porttitor neque nisl, at tincidunt mauris ultricies vel. 
-                    Sed id tortor vel libero aliquam euismod. Integer lobortis massa nunc, eu vulputate nisl suscipit non. 
-                    Nulla tempus velit et molestie suscipit. Nullam mollis, odio non dictum efficitur, enim odio rhoncus tellus, vel tempor nibh orci quis turpis. 
-                    Maecenas sed elit porttitor, sodales nisl sit amet, suscipit tellus.
+                <p>
+                    In 18,000 X-ray images, they supplied 15,000 images for training set with each image has multiple annotations by radiologists via the csv file and 3,000 images for test set without any annotations. 
+                    All the images in training set were labeled by a panel experienced radiologists for presence of 14 critical radiographic finding as 0 – Aortic enlargement, 1 – Atelectasis, 2 – Calcification, 3 – Cardiomegaly, 4 – Consolidation, 5 – ILD, 6 – Infiltration, 7 – Lung Opacity, 8 – Nodule/Mass, 9 – Other lesion, 10 – Pleural effusion, 11 - Pleural thickening, 12 – Pneumothorax, 13 – Pulmonary fibrosis, 14 – No finding. 
+                    The “No finding” (14) observation was intended to capture the absence of all findings above. 
                 </p>
+
+                <p>
+                    train_downsampled.csv – the train set, with one row for each object, including a type of disease and offset value of ground truth bounding box (x_min, y_min, x_max, y_max) 
+                </p>
+
+                <h2> 2. Explore Data Analysis </h2> 
+                <h3> 2.1. Explore image classification problem </h3> 
+                <p>
+                    In the original CSV file, it has 67914 rows with 15,000 images with each row is the annotation of each image’s id by individual radiologist. 
+                    Therefore, the individual image is diagnosed by many radiologists. Next, separate the original CSV file to two parts: 
+                    CSV file1 contains all annotations of image with “No finding” class and each image are diagnosed by many radiologists 
+                    (in this figure 1 below is 3 radiologists). CSV file2 contains all annotation of image with 14 classes of diseases and each image has 
+                    several diseases that are diagnosed by many radiologist (in this figure 1 below that image has 5 disease and be diagnosed by 3 radiologists).  
+                <p>
+
+                <div class="d-flex justify-content-center">
+                        <img  src="../../../../media/report_images/methodology/figure1.png" width="100%">  
+                        {% comment %} height="50%" width="50%"> {% endcomment %}
+                </div>
+
+                <p class="d-flex justify-content-center"> 
+                    Figure 1. No finding and other diseases in annotation dataset
+                </p>
+
+                <p> 
+                    The big problem might appear if whether in this dataset has an image that has both the diseases by the radiologist’s diagnosis and has no detection by the other radiologist’s diagnosis. 
+                    But fortunately, this case is not existence because the total of images of both CSV file1 and CSV file2 is equal with the total of images in the original dataset. 
+                </p>
+
+                <p> 
+                    In the figure 2 below. The dominance of the “No finding” class in the original dataset. The reason why is the imbalance in the contribution of radiologists made the imbalance classes. 
+                    As shown the figure 3 below 14 over 17 radiologists have 80% of “No finding” class in their contribution and 6 radiologists in it have 100% of “No finding” class. 
+                    The imbalance of number of disease The number of disease and the contribution of radiologists have a strong relationship with p < 0.01 and statistic > critical value (2883.07 > 170.4) by chi-squared test. 
+                </p>
+
+                <div class="d-flex justify-content-center">
+                    <img  src="../../../../media/report_images/methodology/figure2.png" width="100%">  
+                </div>
+
+                <p class="d-flex justify-content-center"> 
+                    Figure 2. Number of class in annotation dataset
+                </p>
+
+                <div class="d-flex justify-content-center">
+                    <img  src="../../../../media/report_images/methodology/figure3.png" width="100%">  
+                </div>
+
+                <p class="d-flex justify-content-center"> 
+                    Figure 3. Contribution of each radiologist
+                </p>
+
+                <p> 
+                    Based on result of chi-square test, the number of positive classes are affected by the contribution of radiologist and so the sampling process is bad that made the radiologist’s contributions
+                     have different where several radiologists deal with too many X-ray images and some radiologist only deal with the images with negative class. Additionally, based on the data information, 
+                     these data were collected by 17 radiologists from 2 hospital (108 Military Central Hospital and Hanoi Medical University Hospital). Therefore, that sampling process is not correct cause it 
+                     made the class imbalance Beside that some disease in 14 thoracic lung diseases are diseases with rare rates like Pneumothorax and some diseases are common like Mass. So, the decision to 
+                     synthesize 14 diseases for diagnosis is not good cause it made the number of diseases is imbalance. 
+                </p>
+
+                <p> 
+                    In the object detection, the model just gets the information from the images with have the ground truth bounding boxes cause the model will extract feature form the bounding box regions. 
+                    Therefore, the image with contain the “no finding” class mean does not have the disease is not useful. Therefore, from in the 3.4.2 part, we just use the images with contain the ground truth bounding boxes. 
+                    Number of images contain the diseases: 4394 images. 
+                </p>
+
+                <p> 
+                    This dataset has a various size of image with value of height from 570 pixels (minimum) to 1136 pixels (maximum) and value of width from 524 pixels (minimum) to 1106 pixels  (maximum). 
+                    The Pearson correlation between image height and width is 0.64. So, this relationship is positive which image’s height and width both increase or decrease. 
+                </p>
+
+                <div class="d-flex justify-content-center">
+                    <img  src="../../../../media/report_images/methodology/figure4.png" width="100%">  
+                </div>
+
+                <p class="d-flex justify-content-center"> 
+                    Figure 4. Distribution of width and height of image
+                </p>
+
+
+                <div class="d-flex justify-content-center">
+                    <img  src="../../../../media/report_images/methodology/figure5.png" width="100%">  
+                </div>
+
+                <p class="d-flex justify-content-center"> 
+                    Figure 5. Box plot of width and height of image
+                </p>
+
+                <p> 
+                    As the figure 4 shown, the range of image’s width and image’s height have many lower outliers. 
+                    To get the number of outliers of image height and width, apply the formula of Interquartile Range (IQR) with formula. 
+                </p>
+
+                <ul>
+                    <li> Lower outlier=Q1−1.5 ×IQR </il>
+                    <li> Higher outlier=Q3+1.5 × IQR </il>            
+                </ul>
+
+                <p> 
+                    Where Q1 is quartile 25th, Q3 is quartile 75th and IQR = Q3 – Q1. 
+                </p>
+
+                <p> 
+                    In the image height: number of lower outliers: 97, number of higher outliers: 0. 
+                    In the image width: number of lower outliers: 3, number of higher outliers: 0. Total outliers: 100. 
+                </p>
+
+                <p>
+                    The ratio of image base on the formula: 
+                </p>
+
+                <div class="d-flex justify-content-center">
+                    <img  src="../../../../media/report_images/methodology/img_ratio_formula.png" width="50%">  
+                </div>
+
+                <p> 
+                    In the figure 5 below, the distribution of img’s_ratio has two peaks with the higher is 0.8 and the other 
+                    is 1 and number of images have img’s_ratio < 1, img’s_ratio = 1, 
+                    img’s_ratio > 1 are 3547 images (80.7%), 485 images (11.04%), 362 images (8.26%). 
+                </p>
+
+
+                <div class="d-flex justify-content-center">
+                    <img  src="../../../../media/report_images/methodology/figure6.png" width="100%">  
+                </div>
+
+                <p class="d-flex justify-content-center"> 
+                    Figure 6. Distribution of image ratio
+                </p>
+
+                <p>
+                    For the images has the ratio smaller than 1, then the image’s height > image’s width. 
+                    Therefore, these images are the same the typical X-ray images. 
+                </p>
+
+
+                <div class="d-flex justify-content-center">
+                    <img  src="../../../../media/report_images/methodology/figure7.png" width="100%">  
+                </div>
+
+                <p class="d-flex justify-content-center"> 
+                    Figure 7. Sample of CXR image with ratio < 1
+                </p>
+
+                <p> 
+                    For the images has the ratio equal 1, then the image’s height = image’s width. Therefore, these images are symmetry.
+                </p>
+
+                <div class="d-flex justify-content-center">
+                    <img  src="../../../../media/report_images/methodology/figure8.png" width="100%">  
+                </div>
+
+                <p class="d-flex justify-content-center"> 
+                    Figure 8. Sample of CXR image with ratio = 1
+                </p>
+
+                <p>
+                    For the images has the ratio higher than 1, then the image’s height < image’s width.  
+                    Therefore, these images are zoom in more than 2 cases above. 
+                </p>
+
+                <div class="d-flex justify-content-center">
+                    <img  src="../../../../media/report_images/methodology/figure9.png" width="100%">  
+                </div>
+
+                <p class="d-flex justify-content-center"> 
+                    Figure 9. Sample of CXR image with ratio > 1
+                </p>
+
+                <p>
+                    Based on all the reasons above, when put images for training, we should transform the size of images in a range from 800 – 1000 cause the median of image height and width are 960 and 820 and convert the image’s ratio to equal 1 because do not affect the image’s ratio equal 1 before and the other mostly increase the image’s resolution (image’s ratio < 1, then increase width or image’s ratio > 1, then increase height).  
+                </p>
+
+                <p> 
+                    The images size of this dataset has a diversity, so to get the bounding boxes area of all diseases of entire images, first should normalized the offset value of bounding box with the corresponding image. 
+                    The formula to normalize image:  
+                </p>
+
+                <ul>
+                    <li> X_min_normi = X_mini / image_width </il>
+                    <li> Y_min_normi = Y_mini / image_height </il>         
+                    <li> X_max_normi = X_mini / image_width </il>
+                    <li> Y_max_normi = Y_mini / image_height </il>   
+                    <li> Bouding_box_area_normi = (X_max_normi - X_min_normi) × (Y_max_normi - Y_max_normi) </il>
+                </ul>
+
+                <div class="d-flex justify-content-center">
+                    <img  src="../../../../media/report_images/methodology/figure10.png" width="100%">  
+                </div>
+
+                <p class="d-flex justify-content-center"> 
+                    Figure 10. Bounding box area after normalization of each class 
+                </p>
+
+                <p> 
+                    As the figure 9, the average bounding boxes area of ILD, Pneumothorax and Cardinally is too larger than the average bounding boxes area of Pleural thickening, Calcification and Module/Mass.  
+                </p>
+
+                <p>
+                    In the figure 10 below show the heat map of all bounding boxes of 14 diseases in this dataset. 
+                    Only two diseases are Aortic enlargement and Cardiomegaly that have centralized one region, but the other diseases still decentralized region. 
+                    The ILD has 2 main regions (one on the left, one on the right) but inside these region, the diseases are labeled at certain locations. 
+                    The Pneumothorax, Consolidation and Lung opacity has 2 main region but concentrated mainly in the right location. And the particular case is Other lesion even thought concentrates in the middle region but it appears at many different region then The dispersion of Other lesion is too high. 
+                </p>
+
+                <div class="d-flex justify-content-center">
+                    <img  src="../../../../media/report_images/methodology/figure11.png" width="100%">  
+                </div>
+
+                <p class="d-flex justify-content-center"> 
+                    Figure 11. Heat map of bounding boxes for each class 
+                </p>
+
+                <p> 
+                    Take ILD sample to understand why the dispersion of ILD is high. 
+                    In the figure 11 below, the image has 6 different ground truth bounding boxes of ILD diseases that are diagnosed and labeled by 3 radiologists (R15, R14, R11) – table on the left of figure. 
+                    Each radiologist just diagnosed this X-ray image 2 region of ILD disease but when they drew the bounding box of this disease, they have a different perceptron about the region of disease. 
+                </p>
+
+                <div class="d-flex justify-content-center">
+                    <img  src="../../../../media/report_images/methodology/figure12.png" width="100%">  
+                </div>
+
+                <p class="d-flex justify-content-center"> 
+                    Figure 12. ILD labels in annotation dataset 
+                </p>
+
+                <p> 
+                    As shown in figures 12 below, The ILD are diagnosed and labeled by radiologists has different location, area of region like the radiologist with ID R11 who labeled and drew the small bounding box but contrast with R11 the radiologist with ID R15 who labeled and drew the bigger than. 
+                    The reason why has the different of bounding boxes by radiologist is the ILD that is occurred when the damaged and thickened the tissues wall inside the lung figure 1 above, therefore some radiologists want to identify clearly and drew the box where the damaged tissues and some other radiologist just drew the box on entire the lung location.  
+                </p>
+
+                <div class="d-flex justify-content-center">
+                    <img  src="../../../../media/report_images/methodology/figure13.png" width="100%">  
+                </div>
+
+                <p class="d-flex justify-content-center"> 
+                    Figure 13. ILD label according to radiologists 
+                </p>
+
+                <p> 
+                    In this case, if eliminate the overlapping bounding boxes and just keep the largest bounding boxes like the bounding boxes of radiologist ID R15, these bounding boxes just contain a little region of ILD and it contains the different parts of the human body like chest bone, so that make a model misunderstands the characteristics of ILD. 
+                    Contrast, if eliminate the overlapping bounding boxes and just keep the smallest bounding boxes like the bounding boxes of radiologist ID R11, these bounding boxes might contain entire the region of ILD, this is good for model to learn the characteristics of ILD however this will loss the relationship of diseases with the other part of human like ILD occurs inside the lung, therefore this disease just appear at the lung location in the image so that leads the models do not really know the ILD should be inside the lung’s location. 
+                    All of the reason above, we should not eliminate the ground truth bounding boxes base on the box size, therefore to eliminate we should base on the intersection of union (IoU) of all bounding boxes with the same class. 
+                    The technique depends on IoU like Non- Maximum Suppression (NMS)/ Soft Non-Maximum Suppression (Soft-NMS)/ Weighted Boxes Fusion (WBF) so apply 3 techniques then we compare the result in next part. 
+                </p>
+
+                <h3> 2.2. Data processing </h3> 
+                <p> 
+                    Because of all of the difference in the size of the bounding boxes mentioned above, in this study, we did not eliminate the ground truth bounding boxes, but modified them based on the Intersection over Union (IoU) of all bounding boxes in the same class. 
+                    There are several techniques depending on IoU such as Non-Maximum Suppression (NMS), Soft Non-Maximum Suppression (Soft-NMS) and WBF.  
+                </p>
+
+                <p> 
+                    The NMS approach is used to get rid of the superfluous overlapping bounding boxes in object identification models when having multiple overlapped bounding boxes might result in high recall values. 
+                    Since nearby less confident neighbors are likely to cover the same item, NMS picks high score detections with greed and deletes nearby less confident neighbors. When compared to suggested alternatives, this approach is remarkably competitive, quick, and simple. 
+                    The algorithm of NMS is described in the Algorithm 1.
+                </p>
+
+                <div class="d-flex justify-content-center">
+                    <img  src="../../../../media/report_images/methodology/algorithm1.png" width="100%">  
+                </div>
+
+                <p> 
+                    Soft-NMS is a variant of NMS. 
+                    Instead of eliminating the redundant of overlapping bounding boxes, Soft-NMS penalizes the redundant bounding boxes by reducing its confidence score. 
+                    The algorithm of Soft-NMS is shown in Algorithm 2.
+                </p>
+
+                <div class="d-flex justify-content-center">
+                    <img  src="../../../../media/report_images/methodology/algorithm2.png" width="100%">  
+                </div>
+
+                <p>
+                    Combining object detection model predictions using the WBF approach. 
+                    The suggested WBF approach, in contrast to NMS and soft-NMS methods, constructs average boxes using confidence scores of every proposed bounding boxes. [18]. 
+                    Algorithm 3 describes the process of WBF. 
+                </p>
+
+                <div class="d-flex justify-content-center">
+                    <img  src="../../../../media/report_images/methodology/fb_formula.png" width="100%">  
+                </div>
+
+                <div class="d-flex justify-content-center">
+                    <img  src="../../../../media/report_images/methodology/fs_formula.png" width="80%">  
+                </div>
+
+                <p> 
+                    This study has applied all three techniques to compare their results.
+                </p>
+
+                <table class="table">
+                    <caption>Table 1. NMS, Soft-NMS, WBF results </caption>
+                    <thead>
+                      <tr>
+                        {% comment %} <th scope="col">#</th> {% endcomment %}
+                        <th scope="col"> </th>
+                        <th scope="col">Number of boxes</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        {% comment %} <th scope="row">1</th> {% endcomment %}
+                        <td>Original boxes </td>
+                        <td>36,096 </td>
+                      </tr>
+                      <tr>
+                        {% comment %} <th scope="row">2</th> {% endcomment %}
+                        <td>NMS@0.5 </td>
+                        <td>23,940 (↓ 33.7%) </td>
+                      </tr>
+                      <tr>
+                        {% comment %} <th scope="row">3</th> {% endcomment %}
+                        <td>Soft-NMS@0.5 </td>
+                        <td>32,273 (↓ 10.6%) </td>
+                      </tr>
+                      <tr>
+                        {% comment %} <th scope="row">3</th> {% endcomment %}
+                        <td>WBF@0.5 </td>
+                        <td>23.955 (↓ 33.64%) </td>
+                      </tr>
+                    </tbody>
+                </table>
+
+                {% comment %} <p class="d-flex justify-content-center"> 
+                    Table 1. NMS, Soft-NMS, WBF results
+                </p> {% endcomment %}
+            
+                <p> 
+                    Figure 14 explains the difference of NMS and WBF. 
+                    WBF bases on all the ground truth bounding boxes of 3 doctors (R8, R9, R10) and generates the new bounding boxes. 
+                    In another circumstance, the NMS chooses the bounding boxes with highest confidence score. 
+                    However, in this case, all bounding boxes are the ground truths therefore all of confidence score of those boxes are equal to 1. 
+                    Therefore, NMS will choose randomly. In the Fig. 6, NMS randomly chose the ground truth bounding box of doctor R2. 
+                    That is why the performance of WBF is better than NMS because it generates the new bounding boxes based on all information on the ground truth bounding boxes of the doctors. 
+                    Figure 28 shows the different performances of NMS and WBF with IoU threshold equal to 0.2, the NMS eliminates the large. 
+                    Other lesion ground truth in the middle while the WBF generates the new ground truth based on all ground truth bounding boxes so it generates new large Other lesion ground truth bounding boxes on the left. 
+                </p>
+
+                <div class="d-flex justify-content-center">
+                    <img  src="../../../../media/report_images/methodology/figure14.png" width="100%">  
+                </div>
+
+                <p class="d-flex justify-content-center"> 
+                    Figure 14. Different principle of NMS and WBF 
+                </p>
+
+
+                <div class="d-flex justify-content-center">
+                    <img  src="../../../../media/report_images/methodology/figure15.png" width="100%">  
+                </div>
+
+                <p class="d-flex justify-content-center"> 
+                    Figure 15. Different result of NMS and WBF at threshold 0.2 
+                </p>
+
+                <p> 
+                    Based on the exploring data analysis section, the original dataset is split into groups. 
+                    First group is all annotations of R8, R9, R10, that contains almost all of the images (94.35%), called Standard Dataset. 
+                    Second group is all annotations from R11 to R17, that contains other parts of images and have many noises in the bounding boxes because the doctor’s diagnoses are inconsistent. 
+                    And after processing that group, it is called “Additional Dataset”. 
+                </p>
+
+                <p> 
+                    Figure 15 shows that with different IoU thresholds, the performances of WBF are different. 
+                    When the IoU equals to 0.3, the WBF reduces several ground truth bounding boxes while the IoU equal to 0.2, the new ground truth bounding box on the top right contains the wrong location of calcification disease. 
+                    That is the reason why we must calculate the IoU of each disease with different diagnoses of doctors then getting the average value of those IoU. 
+                    This study used Standard Dataset for calculating the average value of all diseases except Other lesion and pleural thickening because those 2 diseases have dispersion in heat map. 
+                    Our result of IoU threshold is 0.4 in Table 7. 
+                </p>
+
+                <div class="d-flex justify-content-center">
+                    <img  src="../../../../media/report_images/methodology/figure16.png" width="100%">  
+                </div>
+
+                <p class="d-flex justify-content-center"> 
+                    Figure 16. Result of WBF at different IoU threshold 
+                </p>                   
+                    
+                <table class="table">
+                    <caption> Table 2. IoU threshold calculation </caption>
+                    <thead>
+                      <tr>
+                        <th scope="col">Class name </th>
+                        <th scope="col">IOU in ground truth </th>
+                        <th scope="col">IOU threshold </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Aortic enlargement </td>
+                        <td>0.688 </td>
+                        <td>0.3 </td>
+                      </tr>
+                      <tr>
+                        <td>Atelectasis </td>
+                        <td>0.48 </td>
+                        <td>0.5 </td>
+                      </tr>
+                      <tr>
+                        <td>Calcification </td>
+                        <td>0.55 </td>
+                        <td>0.5 </td>
+                      </tr>
+                      <tr>
+                        <td>Cardiomegaly  </td>
+                        <td>0.73 </td>
+                        <td>0.3 </td>
+                      </tr>
+                      <tr>
+                        <td>Consolidation </td>
+                        <td>0.6 </td>
+                        <td>0.4 </td>
+                      </tr>
+                      <tr>
+                        <td>ILD </td>
+                        <td>0.59 </td>
+                        <td>0.4 </td>
+                      </tr>
+                      <tr>
+                        <td>Infiltration </td>
+                        <td>0.57 </td>
+                        <td>0.4 </td>
+                      </tr>
+                      <tr>
+                        <td>Lung Opacity </td>
+                        <td>0.52 </td>
+                        <td>0.5 </td>
+                      </tr>
+                      <tr>
+                        <td>Nodule/Mass </td>
+                        <td>0.64 </td>
+                        <td>0.4 </td>
+                      </tr>
+                      <tr>
+                        <td>Other lesion </td>
+                        <td>0.5 </td>
+                        <td>0.5 </td>
+                      </tr>
+                      <tr>
+                        <td>Pleural effusion </td>
+                        <td>0.5 </td>
+                        <td>0.5 </td>
+                      </tr>
+                      <tr>
+                        <td>Pleural effusion </td>
+                        <td>0.47 </td>
+                        <td>0.5 </td>
+                      </tr>
+                      <tr>
+                        <td>Pneumothorax </td>
+                        <td>0.68 </td>
+                        <td>0.5 </td>
+                      </tr>
+                      <tr>
+                        <td>Pulmonary fibrosis </td>
+                        <td>0.5 </td>
+                        <td>0.5 </td>
+                      </tr>
+                      <tr>
+                        <td colspan="3">Mean with except Other lesion and Pleural thickening = 0.4 </td>
+                      </tr>
+                    </tbody>
+                </table>
+
+                <p> 
+                    To process all annotations from R11 to R17, min-max normalization is first applied for the offset value of ground truth bounding boxes, then calculating the area of ground truth bounding boxes after each disease normalization. 
+                    The values are then averaged in each disease saved in the Standard Dataset – table 8 and comparing the diagnoses of each doctor in the Additional Dataset. 
+                    In table 9, we compared the Standard Dataset with doctor R11 in Additional Dataset to obtain the suitable ground truth bounding boxes of R11. 
+                </p>
+
+                {% comment %} Table 3 {% endcomment %}
+                <table class="table">
+                    <caption>Table 3. Mean bounding box area after normalization of Standard Dataset </caption>
+                    <thead>
+                      <tr>
+                        <th scope="col">Rad_id </th>
+                        <th scope="col">Class name </th>
+                        <th scope="col">Num bboxes </th>
+                        <th scope="col">Mean bboxes area norm </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td rowspan="14"> R9_R10_R11 </td> 
+                        <td>Aortic enlargement </td>
+                        <td>6956 </td>
+                        <td>0.0145 </td>
+                      </tr>
+                      <tr>
+                        <td>Atelectasis </td>
+                        <td>230 </td>
+                        <td>0.04917 </td>
+                      </tr>
+                      <tr>
+                        <td>Calcification </td>
+                        <td>758 </td>
+                        <td>0.00764 </td>
+                      </tr>
+                      <tr>
+                        <td>Cardiomegaly </td>
+                        <td>5268 </td>
+                        <td>0.05997 </td>
+                      </tr>
+                      <tr>
+                        <td>Consolidation </td>
+                        <td>520 </td>
+                        <td>0.03731 </td>
+                      </tr>
+                      <tr>
+                        <td>ILD </td>
+                        <td>812 </td>
+                        <td>0.07503 </td>
+                      </tr>
+                      <tr>
+                        <td>Infiltration </td>
+                        <td>1189 </td>
+                        <td>0.03886 </td>
+                      </tr>
+                      <tr>
+                        <td>Lung Opacity </td>
+                        <td>2382 </td>
+                        <td>0.02751 </td>
+                      </tr>
+                      <tr>
+                        <td>Nodule/Mass </td>
+                        <td>2468 </td>
+                        <td>0.00427 </td>
+                      </tr>
+                      <tr>
+                        <td>Other lesion </td>
+                        <td>2035 </td>
+                        <td>0.0248 </td>
+                      </tr>
+                      <tr>
+                        <td>Pleural effusion </td>
+                        <td>2395 </td>
+                        <td>0.02423 </td>
+                      </tr>
+                      <tr>
+                        <td>Pleural effusion </td>
+                        <td>4741 </td>
+                        <td>0.00698 </td>
+                      </tr>
+                      <tr>
+                        <td>Pneumothorax </td>
+                        <td>219 </td>
+                        <td>0.09259 </td>
+                      </tr>
+                      <tr>
+                        <td>Pulmonary fibrosis </td>
+                        <td>4489 </td>
+                        <td>0.01511 </td>
+                      </tr>
+                      <tr>
+                        <td colspan="4" style="text-align: center"><strong>Total annotations:</strong> 34462/36096 <br><strong>Total images:</strong> 4146/4394</td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+                  {% comment %} Table 4 {% endcomment %}
+                <table class="table">
+                    <caption>Table 4. Standard Dataset compare with label of R11 </caption>
+                    <thead>
+                      <tr>
+                        <th scope="col">Rad_id </th>
+                        <th scope="col">Class name </th>
+                        <th scope="col">Residual bboxes area norm (R11 – R8_R9_R10) </th>
+                        <th scope="col">Ratio bboxes area norm (R11 / R8_R9_R10) </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td rowspan="14"> R8_R9_R10 and R11 </td> 
+                        <td>Aortic enlargement </td>
+                        <td>0.03701 </td>
+                        <td>3.55 </td>
+                      </tr>
+                      <tr>
+                        <td>Atelectasis </td>
+                        <td>0.0093 </td>
+                        <td>1.19 </td>
+                      </tr>
+                      <tr>
+                        <td>Calcification </td>
+                        <td>0.00049 </td>
+                        <td>1.06 </td>
+                      </tr>
+                      <tr>
+                        <td>Cardiomegaly </td>
+                        <td>0.04316 </td>
+                        <td>1.72 </td>
+                      </tr>
+                      <tr>
+                        <td>Consolidation </td>
+                        <td>0.01147 </td>
+                        <td>1.31 </td>
+                      </tr>
+                      <tr>
+                        <td>ILD </td>
+                        <td>-0.04563 </td>
+                        <td>0.39 </td>
+                      </tr>
+                      <tr>
+                        <td>Infiltration </td>
+                        <td>-0.03886 </td>
+                        <td>0 </td>
+                      </tr>
+                      <tr>
+                        <td>Lung Opacity </td>
+                        <td>-0.01554 </td>
+                        <td>0.43511 </td>
+                      </tr>
+                      <tr>
+                        <td>Nodule/Mass </td>
+                        <td>0.00597 </td>
+                        <td>2.39813 </td>
+                      </tr>
+                      <tr>
+                        <td>Other lesion </td>
+                        <td>0.01215 </td>
+                        <td>1.48992 </td>
+                      </tr>
+                      <tr>
+                        <td>Pleural effusion </td>
+                        <td>0.00826 </td>
+                        <td>1.34 </td>
+                      </tr>
+                      <tr>
+                        <td>Pleural effusion </td>
+                        <td>0.00946 </td>
+                        <td>2.36 </td>
+                      </tr>
+                      <tr>
+                        <td>Pneumothorax </td>
+                        <td>-0.08059 </td>
+                        <td>0.13 </td>
+                      </tr>
+                      <tr>
+                        <td>Pulmonary fibrosis </td>
+                        <td>0.0033 </td>
+                        <td>1.2184 </td>
+                      </tr>
+                      <tr>
+                        <td colspan="4" style="text-align: center"><strong>Total annotations:</strong> 34462/36096 <br><strong>Total images:</strong> 4146/4394</td>                       
+                      </tr>
+                    </tbody>
+                  </table>
+          
+                  <p>
+                    After comparing all ground truth bounding boxes of the doctors (R11-R17) to get the novel Additional Dataset and adding it into the Standard Dataset to generated Final data. 
+                    The figure 17 summaries the above data processing. 
+                  </p>
+
+                  <div class="d-flex justify-content-center">
+                    <img  src="../../../../media/report_images/methodology/figure17.png" width="100%">  
+                  </div>
+
+                <p class="d-flex justify-content-center"> 
+                    Figure 17. Data processing pipeline 
+                </p>
+
+                <p>
+                    After generating the Final data, several image augmentation techniques are applied such as padding, horizontal flip and rotation images 
+                    then random split data with 80% for training dataset and 20% for validation dataset in figure 18.
+                </p>
+
+                <div class="d-flex justify-content-center">
+                    <img  src="../../../../media/report_images/methodology/figure18.png" width="100%">  
+                  </div>
+
+                <p class="d-flex justify-content-center"> 
+                    Figure 18. Augmentation and train-validation split 
+                </p>
+
+                <h2>3. Methodology</h2>
+                <p>
+                    Transfer learning is a deep learning approach that involves training a neural network model on an issue that is similar to the one that has to be addressed. 
+                    A new model trained on the target issue then incorporates one or more layers from the trained model. 
+                </p>
+
+                <p> 
+                    Based on the advantages of transfer learning and the goal of this study, a popular model was employed is RetinaNet, which was presented by Lin from Facebook AI Study. 
+                    RetinaNet is a one-stage object identification model that addresses class imbalance during training by using a focused loss function. 
+                    To focus learning on challenging negative examples, the focal loss modifies the Cross Entropy (CE) loss. 
+                    RetinaNet network architecture uses a FPN in the backbone with the bottom up is ResNet architecture. 
+                </p>
+
+                <p> 
+                    As shown in figure 19, the training process of our system employed RetinaNet model. 
+                    Furthermore, based on the experiment results, ResNet101 is chosen as best backbone for RetinaNet in the study. 
+                </p>
+
+                <div class="d-flex justify-content-center">
+                    <img  src="../../../../media/report_images/methodology/figure19.png" width="100%">  
+                  </div>
+
+                <p class="d-flex justify-content-center"> 
+                    Figure 19. Model architecture 
+                </p>
+
+                <p>
+                    Feature Pyramid Network with ResNet101 backbone: figure 19 show the FPN with ResNet101 backbone works. 
+                    On the left-hand side is the bottom-up pathway that contains five stages feature map (C1 – C5) which have different scale and channels. 
+                    The right-hand side shows the top-down structure of FPN that contains five components (P2 – P6) with each component 
+                    have lateral connection with corresponding to stage of feature map of bottom-up pathway. 
+                    P2 – P6 have 256 channels are the output of FPN. The purpose of FPN is able to extract the most informative data of the image. 
+                </p>
+
+                <div class="d-flex justify-content-center">
+                    <img  src="../../../../media/report_images/methodology/figure20.png" width="100%">  
+                  </div>
+
+                <p class="d-flex justify-content-center"> 
+                    Figure 20. Feature Pyramid Network with ResNet101 backbone 
+                </p>
+
+                <p> 
+                    Classification subnetwork and regression subnetwork: 
+                    The outputs of RetinaNet are the predictive class labels and the offset value of bounding boxes corresponding to predictive class labels. 
+                    Therefore, the RetinaNet has two subnetworks for the output, one of them treats the region of interest as image classification and the other treats it as bounding boxes regression. 
+                </p>
+
+                <h2>4. Result</h2>
+                <p>
+                    Table 5 compares the mAP of 14 lung diseases prediction among the proposed method and other publications.  
+                </p>
+
+                <table class="table">
+                    <caption>Table 5. Comparison of proposed method and other studies </caption>
+                    <thead>
+                      <tr>
+                        <th scope="col">Study </th>
+                        <th scope="col">Score </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Our method </td>
+                        <td>0.22 (mAP@0.5) </td>
+                      </tr>
+                      <tr>
+                        <td>Heyang Huang [39] </td>
+                        <td>0.21 (mAP@0.5) </td>
+                      </tr>
+                      <tr>
+                        <td>Leaderboard-kaggle </td>
+                        <td>0.31 (mAP@0.4) </td>
+                      </tr>
+                    </tbody>
+                </table>
+
+                <p> 
+                    In Heyang Huang et.al study, they used the same dataset that is collected by VinBigData but the full quality of image with DICOM format 
+                    is utilized while this study used the 3x lower quality of image with JPG format. 
+                    In the processing stage of Heyang Huang’s study, the No finding class is removed and they rescaled the image with 512x512 pixel as the input. 
+                    The Heyang Huang et.al study used baseline of Yolo-v5 model. 
+                    The Yolo model is the most popular model in object detection problem but in this particular problem in medicine as 
+                    the abnormalities detection in CXR image, the Yolo model is hard to deal the disease with various sizes in each image and new or unusual aspect ratio of image. 
+                    Furthermore, Yolo struggles to deal with imbalance dataset and small labels inside the large labels. 
+                    The Leaderboard-kaggle was published by the VinBigData Kaggle Competition. 
+                    Unfortunately, they did not propose any method or publication to explain the CXR Abnormalities Detection solving.  
+                </p>
+
+                <p>
+                    Although the proposed study is not among the top performances, the suggested method still has several advantages and the new ways to explore and process dataset 
+                    to generate the new dataset with more consistent and homogeneous. Firstly, the proposed method analyzes the dataset by the data science and statistical approaches. 
+                    Secondly, generating the new ground truth by applying WBF and comparing the labels of doctor to reduce the inconsistence in the dataset. 
+                    Finally, applying several optimization techniques such as learning rate schedule, different loss functions to boost the model performance. 
+                </p>
+
             </div>
 
             <div class="col-4">
                 <h5 class="my-2"> News list </h5>
                 <ul class="list-group my-2">
                     <li class="list-group-item py-1 my-1 px-0 align-items-center border-top-0 border-left-0 border-right-0">
-                        <h6> <a href="{% url 'news_1' %}" style="color:black; text-decoration : none" onmouseover="this.style.color='blue';" onmouseout="this.style.color='black';"> Lorem ipsum dolor sit amet, consectetur adipiscing elit. </a> </h6>
+                        <h6> <a href="{% url 'news_1' %}" style="color:black; text-decoration : none" onmouseover="this.style.color='blue';" onmouseout="this.style.color='black';">Methodology in chest XRay application </a> </h6>
                         <p class="lead mb-1" style="font-size: 12px;  font-style: italic;"> 08/06/2023 </p>
                     </li>
 
                     {% comment %} <hr> {% endcomment %}
 
                     <li class="list-group-item py-1 my-1 px-0 align-items-center border-top-0 border-left-0 border-right-0">
-                        <h6> <a href="{% url 'news_2' %}" style="color:black; text-decoration : none" onmouseover="this.style.color='blue';" onmouseout="this.style.color='black';"> Lorem ipsum dolor sit amet, consectetur adipiscing elit. </a> </h6>
+                        <h6> <a href="{% url 'news_2' %}" style="color:black; text-decoration : none" onmouseover="this.style.color='blue';" onmouseout="this.style.color='black';">Azure Solution Architecture</a> </h6>
                         <p class="lead mb-1" style="font-size: 12px;  font-style: italic;"> 09/06/2023 </p>
                     </li>
 
                     {% comment %} <hr> {% endcomment %}
-
-                    <li class="list-group-item py-1 my-1 px-0 align-items-center border-0">
-                        <h6> <a href="{% url 'news_3' %}" style="color:black; text-decoration : none" onmouseover="this.style.color='blue';" onmouseout="this.style.color='black';"> Lorem ipsum dolor sit amet, consectetur adipiscing elit. </a> </h6>
-                        <p class="lead mb-1" style="font-size: 12px;  font-style: italic;"> 10/06/2023 </p>
-                    </li>
                 </ul>
                 
             </div>

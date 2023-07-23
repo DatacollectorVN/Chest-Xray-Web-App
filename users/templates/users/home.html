@@ -25,27 +25,27 @@
         </div>
 
         <div class="row"> 
-            <div class="col-4"> 
+            <div class="col-6"> 
                 <a href="{% url 'news_1' %}">
-                    <img src="https://picsum.photos/id/237/200/300" height="50%" width="100%">
+                    {% comment %} <img src="https://picsum.photos/id/237/200/300" height="50%" width="100%"> {% endcomment %}
+                    <div class="d-flex justify-content-center">
+                        <img  src="../../../../media/report_images/methodology/figure19.png" width="100%">  
+                    </div>
                 </a>
-                <h4> <a href="{% url 'news_1' %}" style="color:black; text-decoration : none" onmouseover="this.style.color='blue';" onmouseout="this.style.color='black';"> Lorem ipsum dolor sit amet, consectetur adipiscing elit. </a> </h4>
+                <h4> <a href="{% url 'news_1' %}" style="color:black; text-decoration : none" onmouseover="this.style.color='blue';" onmouseout="this.style.color='black';">Methodology in chest XRay application</a> </h4>
                 <p class="lead"> 08/06/2023 </p>
             </div>
 
-            <div class="col-4"> 
+            <div class="col-6"> 
                 <a href="{% url 'news_2' %}">
-                    <img src="https://picsum.photos/id/238/200/300" height="50%" width="100%">
+                    {% comment %} <img src="https://picsum.photos/id/238/200/300" height="50%" width="100%"> {% endcomment %}
+                    
+                    <div class="d-flex justify-content-center">
+                        <img  src="../../../../media/report_images/azure/figure1.png" width="100%">  
+                        {% comment %} height="50%" width="50%"> {% endcomment %}
+                    </div>
                 </a>
-                <h4> <a href="{% url 'news_2' %}" style="color:black; text-decoration : none" onmouseover="this.style.color='blue';" onmouseout="this.style.color='black';" > Lorem ipsum dolor sit amet, consectetur adipiscing elit. </a> </h4>
-                <p class="lead"> 08/06/2023 </p>
-            </div>
-
-            <div class="col-4">
-                <a href="{% url 'news_3' %}">
-                    <img src="https://picsum.photos/id/239/200/300" height="50%" width="100%">
-                </a>
-                <h4> <a href="{% url 'news_3' %}" style="color:black; text-decoration : none" onmouseover="this.style.color='blue';" onmouseout="this.style.color='black';" > Lorem ipsum dolor sit amet, consectetur adipiscing elit. </a> </h4>
+                <h4> <a href="{% url 'news_2' %}" style="color:black; text-decoration : none" onmouseover="this.style.color='blue';" onmouseout="this.style.color='black';" >Azure Solution Architecture</a> </h4>
                 <p class="lead"> 08/06/2023 </p>
             </div>
         </div>
