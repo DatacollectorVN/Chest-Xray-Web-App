@@ -98,10 +98,10 @@ DATABASES = {
         },
     'default': {
         'ENGINE': 'sql_server.pyodbc',
-        'NAME': 'bmev2.1',
+        'NAME': 'bmeDB',
         'USER': 'root_user',
         'PASSWORD': 'Caiquanquegivay123@',
-        'HOST': 'bmecore.database.windows.net',
+        'HOST': 'bmecoredev.database.windows.net',
         'PORT': '1433',
         'OPTIONS': {
             'driver': 'ODBC Driver 18 for SQL Server',
