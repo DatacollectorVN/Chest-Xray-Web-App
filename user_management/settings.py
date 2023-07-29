@@ -30,7 +30,7 @@ SECRET_KEY = str(os.getenv('SECRET_KEY'))
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["127.0.0.1", "localhost", "bmetapp.azurewebsites.net"]
+ALLOWED_HOSTS = ["127.0.0.1", "localhost", "bmewebdev.azurewebsites.net"]
 
 
 # Application definition
